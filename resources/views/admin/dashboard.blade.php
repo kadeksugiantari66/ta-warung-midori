@@ -4,7 +4,7 @@
     <div class="flex justify-between items-end mb-8">
         <div>
             <h2 class="font-headline text-3xl font-black text-primary tracking-tight">Dashboard</h2>
-            <p class="text-on-surface-variant font-medium">Monitoring real-time operasional harian SiMidori.</p>
+            <p class="text-on-surface-variant font-medium">Monitoring real-time operasional harian Warung Midori.</p>
         </div>
         <div class="flex items-center gap-3 bg-surface-container-low px-4 py-2 rounded-2xl">
             <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center">

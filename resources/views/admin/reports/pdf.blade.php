@@ -59,6 +59,6 @@
         </tbody>
     </table>
 
-    <p class="footer">Dicetak pada {{ now()->format('d/m/Y H:i') }} – SiMidori</p>
+    <p class="footer">Dicetak pada {{ now()->format('d/m/Y H:i') }} – Warung Midori</p>
 </body>
 </html>

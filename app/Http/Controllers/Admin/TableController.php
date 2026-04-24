@@ -22,6 +22,10 @@ class TableController extends Controller
     {
         $request->validate([
             'table_number' => ['required', 'string', 'max:10', 'unique:tables,table_number'],
+        ], [
+            'table_number.required' => 'Nomor meja wajib diisi.',
+            'table_number.unique'   => 'Nomor meja sudah terdaftar.',
+            'table_number.max'      => 'Nomor meja maksimal 10 karakter.',
         ]);
 
         $table = Table::create([

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>SiMidori – Meja {{ $table->table_number }}</title>
+    <title>Warung Midori – Meja {{ $table->table_number }}</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -46,7 +46,7 @@
 <header class="fixed top-0 w-full z-50 bg-[#f8faf8]/80 backdrop-blur-md shadow-[0_4px_24px_rgba(21,66,18,0.08)]">
     <div class="flex justify-between items-center px-5 py-4 max-w-screen-xl mx-auto">
         <div>
-            <span class="text-2xl font-headline font-black text-primary">SiMidori</span>
+            <span class="text-2xl font-headline font-black text-primary">Warung Midori</span>
             <span class="block text-[10px] font-bold tracking-widest uppercase text-secondary">Meja {{ $table->table_number }}</span>
         </div>
         <div class="flex items-center gap-2">
@@ -230,7 +230,7 @@
     </div>
 
     <footer class="mt-20 text-center pb-4 border-t border-outline-variant/15 pt-8">
-        <span class="text-2xl font-headline font-black text-primary block mb-1">SiMidori</span>
+        <span class="text-2xl font-headline font-black text-primary block mb-1">Warung Midori</span>
         <p class="text-xs text-on-surface-variant uppercase tracking-[0.2em]">Warung Midori • Bangli, Bali</p>
     </footer>
 </main>

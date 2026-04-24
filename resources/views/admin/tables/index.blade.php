@@ -15,7 +15,7 @@
         <form method="POST" action="{{ route('admin.tables.store') }}">
             @csrf
             <x-form-field label="Nomor Meja" name="table_number" required hint="Contoh: A1, B2, VIP-1">
-                <input type="text" name="table_number" value="{{ old('table_number') }}"
+                <input type="text" id="table_number" name="table_number" value="{{ old('table_number') }}"
                        class="w-full border-outline-variant rounded-xl bg-surface-container-low px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary @error('table_number') border-error @enderror">
             </x-form-field>
             <button type="submit"

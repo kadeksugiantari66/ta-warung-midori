@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Pesanan Dikonfirmasi – SiMidori</title>
+    <title>Pesanan Dikonfirmasi – Warung Midori</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
@@ -33,7 +33,7 @@
 
 <header class="bg-[#f8faf8]/80 backdrop-blur-md border-b border-outline-variant/20 px-5 py-4 sticky top-0 z-10">
     <div class="max-w-lg mx-auto flex items-center gap-3">
-        <span class="text-xl font-headline font-black text-primary">SiMidori</span>
+        <span class="text-xl font-headline font-black text-primary">Warung Midori</span>
         <span class="text-xs font-bold text-on-surface-variant">· Meja {{ $order->table->table_number }}</span>
     </div>
 </header>

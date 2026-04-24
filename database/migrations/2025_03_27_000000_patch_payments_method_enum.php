@@ -5,19 +5,24 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
+    private function isMySql(): bool
+    {
+        return DB::connection()->getDriverName() === 'mysql';
+    }
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        // Add 'tunai' to enum list temporarily to avoid truncation error during update
-        DB::statement("ALTER TABLE payments MODIFY COLUMN method ENUM('cash', 'midtrans', 'tunai') DEFAULT 'tunai'");
-        
-        // Update old 'cash' values to 'tunai' safely
+        // Normalize legacy value for all drivers.
         DB::statement("UPDATE payments SET method = 'tunai' WHERE method = 'cash'");
-        
-        // Finalize enum to only 'tunai' and 'midtrans'
-        DB::statement("ALTER TABLE payments MODIFY COLUMN method ENUM('tunai', 'midtrans') DEFAULT 'tunai'");
+
+        // Enum alteration syntax below is MySQL-specific.
+        if ($this->isMySql()) {
+            DB::statement("ALTER TABLE payments MODIFY COLUMN method ENUM('cash', 'midtrans', 'tunai') DEFAULT 'tunai'");
+            DB::statement("ALTER TABLE payments MODIFY COLUMN method ENUM('tunai', 'midtrans') DEFAULT 'tunai'");
+        }
     }
 
     /**
@@ -25,8 +30,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE payments MODIFY COLUMN method ENUM('cash', 'midtrans', 'tunai') DEFAULT 'cash'");
         DB::statement("UPDATE payments SET method = 'cash' WHERE method = 'tunai'");
-        DB::statement("ALTER TABLE payments MODIFY COLUMN method ENUM('cash', 'midtrans') DEFAULT 'cash'");
+
+        if ($this->isMySql()) {
+            DB::statement("ALTER TABLE payments MODIFY COLUMN method ENUM('cash', 'midtrans', 'tunai') DEFAULT 'cash'");
+            DB::statement("ALTER TABLE payments MODIFY COLUMN method ENUM('cash', 'midtrans') DEFAULT 'cash'");
+        }
     }
 };
