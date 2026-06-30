@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Table;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Storage;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TableSeeder extends Seeder
 {
@@ -19,13 +17,9 @@ class TableSeeder extends Seeder
                 ['status' => 'available']
             );
 
-            // Generate QR jika belum ada
-            if (!$table->qr_code_path) {
-                $url  = url("/order/menu/{$table->id}");
-                $path = "qrcodes/table_{$table->id}.svg";
-                $svg  = QrCode::format('svg')->size(300)->generate($url);
-                Storage::disk('public')->put($path, $svg);
-                $table->update(['qr_code_path' => $path]);
+            // Generate QR dinamis (token) jika belum ada
+            if (! $table->qr_code_path) {
+                $table->generateQr();
             }
         }
     }

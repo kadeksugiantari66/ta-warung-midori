@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
-    protected $fillable = ['product_id', 'rating', 'comment'];
+    protected $primaryKey = 'id_review';
+
+    protected $fillable = ['id_menu', 'rating', 'comment'];
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'id_menu', 'id_menu');
     }
 }

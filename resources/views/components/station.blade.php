@@ -45,6 +45,21 @@
             <span class="font-headline font-black text-lg lg:text-xl">Warung Midori</span>
             <span class="text-primary-fixed/70 text-sm hidden sm:inline">·</span>
             <span class="text-primary-fixed text-sm font-semibold hidden sm:inline">{{ $title ?? '' }}</span>
+
+            {{-- Navigasi terminal (kasir & dapur) --}}
+            @auth
+                <nav class="hidden sm:flex items-center gap-1 ml-2 pl-2 border-l border-white/20">
+                    @if(auth()->user()->isKasir())
+                        <a href="{{ route('kasir.dashboard') }}"
+                           class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('kasir.dashboard') ? 'bg-white/15 text-white' : 'text-primary-fixed/80 hover:bg-white/10' }}">Dashboard</a>
+                        <a href="{{ route('kasir.orders.index') }}"
+                           class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('kasir.orders.*') ? 'bg-white/15 text-white' : 'text-primary-fixed/80 hover:bg-white/10' }}">Pesanan</a>
+                    @elseif(auth()->user()->isDapur())
+                        <a href="{{ route('dapur.dashboard') }}"
+                           class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('dapur.dashboard') ? 'bg-white/15 text-white' : 'text-primary-fixed/80 hover:bg-white/10' }}">Dashboard</a>
+                    @endif
+                </nav>
+            @endauth
         </div>
         <div class="flex items-center gap-2 lg:gap-4">
             {{-- Live indicator --}}

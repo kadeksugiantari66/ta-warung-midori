@@ -14,6 +14,13 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Tabel "staff" sesuai rancangan basis data proposal.
+     */
+    protected $table = 'staff';
+
+    protected $primaryKey = 'id_staff';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -28,14 +35,25 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password'          => 'hashed',
-        'is_active'         => 'boolean',
+        'password' => 'hashed',
+        'is_active' => 'boolean',
     ];
 
     // Role helpers
-    public function isAdmin(): bool { return $this->role === 'admin'; }
-    public function isKasir(): bool { return $this->role === 'kasir'; }
-    public function isDapur(): bool { return $this->role === 'dapur'; }
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isKasir(): bool
+    {
+        return $this->role === 'kasir';
+    }
+
+    public function isDapur(): bool
+    {
+        return $this->role === 'dapur';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

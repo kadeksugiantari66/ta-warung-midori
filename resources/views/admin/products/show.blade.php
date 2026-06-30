@@ -65,10 +65,6 @@
             <h4 class="font-semibold text-sm text-on-surface-variant mb-4">Statistik</h4>
             <div class="space-y-3">
                 <div class="flex justify-between text-sm">
-                    <span class="text-on-surface-variant">Total dipesan</span>
-                    <span class="font-bold">{{ $product->orderItems->count() }}×</span>
-                </div>
-                <div class="flex justify-between text-sm">
                     <span class="text-on-surface-variant">Rating rata-rata</span>
                     <span class="font-bold text-secondary">
                         @if($product->reviews->count())

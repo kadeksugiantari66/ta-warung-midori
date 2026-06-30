@@ -18,11 +18,11 @@ class OrderStatusController extends Controller
             'status' => ['required', 'in:processing,ready,completed'],
         ]);
 
-        $order->update(['status' => $request->status]);
-
-        // Bebaskan meja saat pesanan selesai diantar
+        // Saat pesanan selesai: bebaskan meja + rotasi QR (lewat service bersama)
         if ($request->status === 'completed') {
-            $order->table->update(['status' => 'available']);
+            $order->complete();
+        } else {
+            $order->update(['status' => $request->status]);
         }
 
         return back()->with('success', "Status pesanan #{$order->queue_number} diperbarui.");

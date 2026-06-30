@@ -97,8 +97,8 @@
             Semua
         </button>
         @foreach ($categories as $category)
-            <button @click="activeCategory = '{{ $category->id }}'"
-                    :class="activeCategory === '{{ $category->id }}' ? 'bg-primary text-white' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-variant'"
+            <button @click="activeCategory = '{{ $category->id_category }}'"
+                    :class="activeCategory === '{{ $category->id_category }}' ? 'bg-primary text-white' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-variant'"
                     class="flex-shrink-0 px-6 py-2.5 rounded-full font-semibold text-sm transition-colors">
                 {{ $category->name }}
             </button>
@@ -113,35 +113,52 @@
         </p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <template x-for="p in searchResults" :key="p.id">
-                <div class="bg-[#ffffff] rounded-[1.5rem] p-4 shadow-[0_2px_12px_rgba(21,66,18,0.06)] flex gap-4 items-center min-h-[100px]">
-                    <div class="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-[#eceeec] flex items-center justify-center">
+                <div class="bg-[#ffffff] rounded-[1.5rem] p-4 shadow-[0_2px_12px_rgba(21,66,18,0.06)] flex gap-4 items-center min-h-[100px]" :class="!p.available && 'opacity-60'">
+                    <div class="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-[#eceeec] flex items-center justify-center">
                         <template x-if="p.image">
                             <img :src="p.image" :alt="p.name" class="w-full h-full object-cover">
                         </template>
                         <template x-if="!p.image">
                             <span class="material-symbols-outlined text-2xl" style="color:#c2c9bb">restaurant</span>
                         </template>
+                        <template x-if="!p.available">
+                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <span class="text-[10px] font-bold text-white uppercase tracking-wide">Habis</span>
+                            </div>
+                        </template>
                     </div>
                     <div class="flex-1 min-w-0">
                         <h3 class="font-headline font-bold text-[#191c1b] text-sm leading-tight" x-text="p.name"></h3>
                         <p class="text-xs mt-0.5 line-clamp-2" style="color:#72796e" x-text="p.description"></p>
+                        <button type="button" x-show="p.review_count > 0" @click="openReviews(p.id)"
+                                class="text-xs mt-1 inline-flex items-center gap-1 hover:underline" style="color:#506600">
+                            <span style="color:#e0b400">★</span> <span x-text="p.rating"></span>
+                            <span style="color:#72796e">(<span x-text="p.review_count"></span> ulasan)</span>
+                        </button>
                         <div class="flex justify-between items-center mt-2">
                             <span class="font-black text-sm" style="color:#154212" x-text="'Rp ' + formatRp(p.price)"></span>
-                            <div x-show="getQty(p.id) > 0" class="flex items-center gap-1.5">
-                                <button @click="decrease(p.id)"
-                                        class="w-7 h-7 rounded-full font-bold flex items-center justify-center text-sm"
-                                        style="background:#eceeec; color:#191c1b">−</button>
-                                <span x-text="getQty(p.id)" class="font-bold text-sm w-5 text-center"></span>
-                                <button @click="increase(p.id, p.name, p.price)"
-                                        class="w-7 h-7 rounded-full font-bold flex items-center justify-center text-sm"
-                                        style="background:#ccf05f; color:#161e00">+</button>
-                            </div>
-                            <button x-show="getQty(p.id) === 0"
-                                    @click="increase(p.id, p.name, p.price)"
-                                    class="w-8 h-8 rounded-full font-bold flex items-center justify-center"
-                                    style="background:#ccf05f; color:#161e00">
-                                <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">add</span>
-                            </button>
+                            <template x-if="p.available">
+                                <div class="flex items-center">
+                                    <div x-show="getQty(p.id) > 0" class="flex items-center gap-1.5">
+                                        <button @click="decrease(p.id)"
+                                                class="w-7 h-7 rounded-full font-bold flex items-center justify-center text-sm"
+                                                style="background:#eceeec; color:#191c1b">−</button>
+                                        <span x-text="getQty(p.id)" class="font-bold text-sm w-5 text-center"></span>
+                                        <button @click="increase(p.id, p.name, p.price)"
+                                                class="w-7 h-7 rounded-full font-bold flex items-center justify-center text-sm"
+                                                style="background:#ccf05f; color:#161e00">+</button>
+                                    </div>
+                                    <button x-show="getQty(p.id) === 0"
+                                            @click="increase(p.id, p.name, p.price)"
+                                            class="w-8 h-8 rounded-full font-bold flex items-center justify-center"
+                                            style="background:#ccf05f; color:#161e00">
+                                        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">add</span>
+                                    </button>
+                                </div>
+                            </template>
+                            <template x-if="!p.available">
+                                <span class="text-xs font-bold px-3 py-1.5 rounded-full" style="background:#ffdad6; color:#93000a">Habis</span>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -158,7 +175,7 @@
     {{-- Menu Sections --}}
     <div class="space-y-12">
         @foreach ($categories as $category)
-            <section x-show="(activeCategory === 'all' || activeCategory === '{{ $category->id }}') && !search">
+            <section x-show="(activeCategory === 'all' || activeCategory === '{{ $category->id_category }}') && !search">
                 <div class="flex justify-between items-end mb-6">
                     <h2 class="font-headline text-2xl font-bold text-primary">{{ $category->name }}</h2>
                     @if($category->description)
@@ -171,9 +188,9 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach ($products as $i => $product)
                         {{-- Semua card format sama: horizontal dengan gambar kiri --}}
-                        <div class="bg-[#ffffff] rounded-[1.5rem] p-4 shadow-[0_2px_12px_rgba(21,66,18,0.06)] flex gap-4 items-center min-h-[100px]">
+                        <div class="bg-[#ffffff] rounded-[1.5rem] p-4 shadow-[0_2px_12px_rgba(21,66,18,0.06)] flex gap-4 items-center min-h-[100px] {{ $product->is_available ? '' : 'opacity-60' }}">
                             {{-- Gambar --}}
-                            <div class="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-[#eceeec]">
+                            <div class="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-[#eceeec]">
                                 @if($product->image)
                                     <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                                 @else
@@ -181,6 +198,11 @@
                                         <span class="material-symbols-outlined text-2xl" style="color:#c2c9bb">restaurant</span>
                                     </div>
                                 @endif
+                                @unless($product->is_available)
+                                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                        <span class="text-[10px] font-bold text-white uppercase tracking-wide">Habis</span>
+                                    </div>
+                                @endunless
                             </div>
 
                             {{-- Info --}}
@@ -192,32 +214,37 @@
                                             <p class="text-[#72796e] text-xs mt-0.5 line-clamp-2 leading-relaxed">{{ $product->description }}</p>
                                         @endif
                                         @if($product->reviews->count() > 0)
-                                            <p class="text-xs mt-1" style="color:#ccf05f">
-                                                ★ {{ number_format($product->reviews->avg('rating'), 1) }}
-                                                <span style="color:#72796e">({{ $product->reviews->count() }})</span>
-                                            </p>
+                                            <button type="button" @click="openReviews({{ $product->id_menu }})"
+                                                    class="text-xs mt-1 inline-flex items-center gap-1 hover:underline" style="color:#506600">
+                                                <span style="color:#e0b400">★</span> {{ number_format($product->reviews->avg('rating'), 1) }}
+                                                <span style="color:#72796e">({{ $product->reviews->count() }} ulasan)</span>
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
                                 <div class="flex justify-between items-center mt-2">
                                     <span class="font-black text-sm" style="color:#154212">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
 
-                                    {{-- Qty control --}}
-                                    <div x-show="getQty({{ $product->id }}) > 0" class="flex items-center gap-1.5">
-                                        <button @click="decrease({{ $product->id }})"
-                                                class="w-7 h-7 rounded-full font-bold flex items-center justify-center text-sm transition-colors"
-                                                style="background:#eceeec; color:#191c1b">−</button>
-                                        <span x-text="getQty({{ $product->id }})" class="font-bold text-sm w-5 text-center"></span>
-                                        <button @click="increase({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->price }})"
-                                                class="w-7 h-7 rounded-full font-bold flex items-center justify-center text-sm transition-all"
-                                                style="background:#ccf05f; color:#161e00">+</button>
-                                    </div>
-                                    <button x-show="getQty({{ $product->id }}) === 0"
-                                            @click="increase({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $product->price }})"
-                                            class="w-8 h-8 rounded-full font-bold flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-                                            style="background:#ccf05f; color:#161e00">
-                                        <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">add</span>
-                                    </button>
+                                    @if($product->is_available)
+                                        {{-- Qty control --}}
+                                        <div x-show="getQty({{ $product->id_menu }}) > 0" class="flex items-center gap-1.5">
+                                            <button @click="decrease({{ $product->id_menu }})"
+                                                    class="w-7 h-7 rounded-full font-bold flex items-center justify-center text-sm transition-colors"
+                                                    style="background:#eceeec; color:#191c1b">−</button>
+                                            <span x-text="getQty({{ $product->id_menu }})" class="font-bold text-sm w-5 text-center"></span>
+                                            <button @click="increase({{ $product->id_menu }}, '{{ addslashes($product->name) }}', {{ $product->price }})"
+                                                    class="w-7 h-7 rounded-full font-bold flex items-center justify-center text-sm transition-all"
+                                                    style="background:#ccf05f; color:#161e00">+</button>
+                                        </div>
+                                        <button x-show="getQty({{ $product->id_menu }}) === 0"
+                                                @click="increase({{ $product->id_menu }}, '{{ addslashes($product->name) }}', {{ $product->price }})"
+                                                class="w-8 h-8 rounded-full font-bold flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                                                style="background:#ccf05f; color:#161e00">
+                                            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">add</span>
+                                        </button>
+                                    @else
+                                        <span class="text-xs font-bold px-3 py-1.5 rounded-full" style="background:#ffdad6; color:#93000a">Habis</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -362,7 +389,7 @@
     </div>
 </div>
 
-{{-- ── Cart Drawer ──────────────────────────────────────────────────────── --}}
+{{-- ── Keranjang Pesanan ──────────────────────────────────────────────── --}}
 <div x-show="showCart" x-cloak class="fixed inset-0 z-50 flex justify-end">
     <div class="absolute inset-0 bg-black/40" @click="showCart = false; activeTab = 'menu'"></div>
     <div class="relative bg-surface-container-lowest w-full max-w-md h-full flex flex-col shadow-2xl">
@@ -386,7 +413,7 @@
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-sm text-on-surface" x-text="item.name"></p>
                         <p class="text-xs text-secondary font-bold mt-0.5" x-text="'Rp ' + formatRp(item.price)"></p>
-                        <input type="text" x-model="item.note" placeholder="Catatan (opsional)"
+                        <input type="text" x-model="item.note" placeholder="Catatan"
                                class="mt-2 w-full text-xs border-outline-variant rounded-xl bg-surface-container px-3 py-1.5 focus:ring-1 focus:ring-primary">
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
@@ -411,7 +438,16 @@
             <form method="POST" action="{{ route('order.store', $table) }}" id="orderForm">
                 @csrf
                 <div id="orderItems"></div>
-                
+
+                {{-- Email pelanggan untuk pengiriman nota --}}
+                <div class="mb-5">
+                    <label class="block text-sm text-on-surface-variant font-semibold mb-1.5">
+                        Email <span class="font-normal text-xs text-on-surface-variant/70">(nota dikirim ke email)</span>
+                    </label>
+                    <input type="email" name="customer_email" x-model="customerEmail" placeholder="email@contoh.com"
+                           class="w-full border-outline-variant rounded-xl bg-surface-container-low px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                </div>
+
                 {{-- Pemilihan Metode Pembayaran (FR-04.1) --}}
                 <div class="mb-5 space-y-3">
                     <p class="text-sm text-on-surface-variant font-semibold">Pilih Metode Pembayaran</p>
@@ -447,9 +483,46 @@
     </div>
 </div>
 
+{{-- ── Modal Ulasan Menu (bisa dibaca pelanggan) ──────────────────────── --}}
+<div x-show="showReviews" x-cloak class="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+    <div class="absolute inset-0 bg-black/40" @click="showReviews = false"></div>
+    <div class="relative w-full max-w-md bg-surface-container-lowest rounded-t-[2rem] md:rounded-[2rem] shadow-2xl max-h-[80vh] flex flex-col">
+        <div class="flex justify-between items-center px-6 py-5 border-b border-outline-variant/20">
+            <div>
+                <h3 class="font-headline font-bold text-lg text-primary" x-text="activeReviews.name"></h3>
+                <p class="text-xs text-on-surface-variant mt-0.5">
+                    <span style="color:#e0b400">★</span> <span x-text="activeReviews.avg"></span>
+                    · <span x-text="activeReviews.count"></span> ulasan
+                </p>
+            </div>
+            <button @click="showReviews = false" class="p-2 hover:bg-surface-container rounded-xl transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+            <template x-for="(r, idx) in activeReviews.items" :key="idx">
+                <div class="bg-surface-container-low rounded-2xl p-4">
+                    <div class="text-sm" style="color:#e0b400">
+                        <template x-for="s in 5" :key="s"><span x-text="s <= r.rating ? '★' : '☆'"></span></template>
+                    </div>
+                    <p class="text-sm text-on-surface mt-1.5" x-text="r.comment || 'Tanpa komentar'"></p>
+                </div>
+            </template>
+            <template x-if="activeReviews.items.length === 0">
+                <div class="text-center py-10 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-4xl block mb-2 opacity-30">reviews</span>
+                    <p class="text-sm">Belum ada ulasan.</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
 <script>
 // Data semua produk untuk search
 const allProducts = @json($allProducts);
+// Data ulasan per menu (agar bisa dibaca pelanggan)
+const reviewsData = @json($reviewsData);
 
 function orderApp() {
     return {
@@ -459,8 +532,13 @@ function orderApp() {
         showSearch: false,
         search: '',
         paymentMethod: 'midtrans',
+        customerEmail: '',
         activeTab: 'menu',
         showInfo: false,
+
+        // review state
+        showReviews: false,
+        activeReviews: { name: '', avg: 0, count: 0, items: [] },
 
         init() {},
 
@@ -501,13 +579,18 @@ function orderApp() {
 
         formatRp(val) { return new Intl.NumberFormat('id-ID').format(val); },
 
+        openReviews(id) {
+            this.activeReviews = reviewsData[id] || { name: '', avg: 0, count: 0, items: [] };
+            this.showReviews = true;
+        },
+
         submitOrder() {
             if (this.cart.length === 0) return;
             const container = document.getElementById('orderItems');
             container.innerHTML = '';
             this.cart.forEach((item, idx) => {
                 container.innerHTML += `
-                    <input type="hidden" name="items[${idx}][product_id]" value="${item.product_id}">
+                    <input type="hidden" name="items[${idx}][id_menu]" value="${item.product_id}">
                     <input type="hidden" name="items[${idx}][quantity]"   value="${item.quantity}">
                     <input type="hidden" name="items[${idx}][note]"       value="${item.note || ''}">
                 `;

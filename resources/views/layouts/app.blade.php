@@ -112,12 +112,13 @@
                 @if(auth()->user()->isAdmin())
                     @include('layouts.sidenav', ['links' => [
                         ['route' => 'admin.dashboard',       'icon' => 'dashboard',        'label' => 'Dashboard'],
-                        ['route' => 'admin.products.index',  'icon' => 'restaurant_menu',  'label' => 'Menu'],
+                        ['route' => 'admin.orders.index',    'icon' => 'receipt_long',     'label' => 'Pesanan', 'active' => 'admin.orders.*'],
+                        ['route' => 'admin.users.index',     'icon' => 'group',            'label' => 'Staff'],
                         ['route' => 'admin.categories.index','icon' => 'category',         'label' => 'Kategori'],
+                        ['route' => 'admin.products.index',  'icon' => 'restaurant_menu',  'label' => 'Menu'],
                         ['route' => 'admin.tables.index',    'icon' => 'table_restaurant', 'label' => 'Meja & QR'],
-                        ['route' => 'admin.reports.daily',   'icon' => 'bar_chart',        'label' => 'Laporan', 'active' => 'admin.reports.*'],
-                        ['route' => 'admin.users.index',     'icon' => 'group',            'label' => 'Staf'],
                         ['route' => 'admin.reviews.index',   'icon' => 'star',             'label' => 'Ulasan'],
+                        ['route' => 'admin.reports.daily',   'icon' => 'bar_chart',        'label' => 'Laporan', 'active' => 'admin.reports.*'],
                     ]])
                 @elseif(auth()->user()->isKasir())
                     @include('layouts.sidenav', ['links' => [

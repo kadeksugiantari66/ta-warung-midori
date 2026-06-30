@@ -21,7 +21,6 @@
                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Menu</th>
                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Kategori</th>
                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Harga</th>
-                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Dipesan</th>
                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Status</th>
                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant text-right">Aksi</th>
             </tr>
@@ -46,7 +45,6 @@
                     </td>
                     <td class="px-6 py-4 text-sm text-on-surface-variant">{{ $product->category->name }}</td>
                     <td class="px-6 py-4 text-sm font-semibold">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-sm text-on-surface-variant">{{ $product->order_items_count }}×</td>
                     <td class="px-6 py-4">
                         <span class="px-2.5 py-1 text-xs font-bold rounded-full
                             {{ $product->is_available ? 'bg-primary-fixed text-on-primary-fixed' : 'bg-error-container text-on-error-container' }}">
@@ -81,7 +79,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="6" class="px-6 py-12 text-center text-on-surface-variant">Belum ada menu.</td></tr>
+                <tr><td colspan="5" class="px-6 py-12 text-center text-on-surface-variant">Belum ada menu.</td></tr>
             @endforelse
         </tbody>
     </table>

@@ -14,20 +14,20 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'unique:users,email'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:staff,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role'     => ['required', 'in:admin,kasir,dapur'],
+            'role' => ['required', 'in:admin,kasir,dapur'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'name'     => 'nama',
-            'email'    => 'email',
+            'name' => 'nama',
+            'email' => 'email',
             'password' => 'kata sandi',
-            'role'     => 'peran',
+            'role' => 'peran',
         ];
     }
 }

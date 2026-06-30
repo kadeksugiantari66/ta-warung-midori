@@ -18,7 +18,7 @@
 
                     @if(auth()->user()?->isAdmin())
                         <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                            Pengguna
+                            Staff
                         </x-nav-link>
                         <x-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
                             Kategori
@@ -26,11 +26,11 @@
                         <x-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')">
                             Menu
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')">
-                            Ulasan
-                        </x-nav-link>
                         <x-nav-link :href="route('admin.tables.index')" :active="request()->routeIs('admin.tables.*')">
                             Meja & QR
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')">
+                            Ulasan
                         </x-nav-link>
                         <x-nav-link :href="route('admin.reports.daily')" :active="request()->routeIs('admin.reports.*')">
                             Laporan
@@ -94,7 +94,7 @@
 
             @if(auth()->user()?->isAdmin())
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                    Pengguna
+                    Staff
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
                     Kategori
@@ -102,11 +102,11 @@
                 <x-responsive-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')">
                     Menu
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')">
-                    Ulasan
-                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.tables.index')" :active="request()->routeIs('admin.tables.*')">
                     Meja & QR
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')">
+                    Ulasan
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.reports.daily')" :active="request()->routeIs('admin.reports.*')">
                     Laporan

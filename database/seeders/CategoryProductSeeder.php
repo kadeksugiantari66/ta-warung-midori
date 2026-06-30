@@ -5,59 +5,75 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $makanan = Category::firstOrCreate(['name' => 'Makanan'], ['description' => 'Menu makanan utama']);
-        $minuman = Category::firstOrCreate(['name' => 'Minuman'], ['description' => 'Minuman segar']);
-        $camilan = Category::firstOrCreate(['name' => 'Camilan'], ['description' => 'Makanan ringan & pelengkap']);
-        $paket   = Category::firstOrCreate(['name' => 'Paket Hemat'], ['description' => 'Paket lengkap lebih hemat']);
+        $makanan = Category::firstOrCreate(
+            ['name' => 'Makanan'],
+            ['description' => 'Daftar menu makanan']
+        );
+
+        $minuman = Category::firstOrCreate(
+            ['name' => 'Minuman'],
+            ['description' => 'Daftar menu minuman']
+        );
+
+        $jus = Category::firstOrCreate(
+            ['name' => 'Jus'],
+            ['description' => 'Daftar menu jus buah']
+        );
 
         $products = [
-            // ── Makanan ──────────────────────────────────────────────────
-            ['category_id' => $makanan->id, 'name' => 'Ikan Mujair Goreng',       'price' => 35000, 'description' => 'Ikan mujair segar digoreng crispy khas Bangli, disajikan dengan sambal matah dan lalapan.'],
-            ['category_id' => $makanan->id, 'name' => 'Ikan Mujair Bakar',        'price' => 38000, 'description' => 'Ikan mujair bakar bumbu kecap manis, aroma harum khas arang.'],
-            ['category_id' => $makanan->id, 'name' => 'Ikan Mujair Nyat-nyat',    'price' => 42000, 'description' => 'Ikan mujair dimasak bumbu genep Bali, kuah kuning kaya rempah.'],
-            ['category_id' => $makanan->id, 'name' => 'Ikan Mujair Pepes',        'price' => 38000, 'description' => 'Ikan mujair dibungkus daun pisang dengan bumbu rempah pilihan, dikukus hingga meresap.'],
-            ['category_id' => $makanan->id, 'name' => 'Nasi Putih',               'price' => 5000,  'description' => 'Nasi putih pulen, porsi standar.'],
-            ['category_id' => $makanan->id, 'name' => 'Nasi Goreng Ikan',         'price' => 25000, 'description' => 'Nasi goreng dengan potongan ikan mujair, telur, dan sayuran segar.'],
-            ['category_id' => $makanan->id, 'name' => 'Ayam Goreng Bumbu Bali',   'price' => 30000, 'description' => 'Ayam kampung goreng dengan bumbu base genep khas Bali.'],
-            ['category_id' => $makanan->id, 'name' => 'Ayam Bakar Taliwang',      'price' => 32000, 'description' => 'Ayam bakar pedas manis bumbu taliwang, disajikan dengan plecing kangkung.'],
-            ['category_id' => $makanan->id, 'name' => 'Plecing Kangkung',         'price' => 12000, 'description' => 'Kangkung rebus dengan sambal tomat pedas segar khas Bali.'],
-            ['category_id' => $makanan->id, 'name' => 'Lawar Nangka',             'price' => 15000, 'description' => 'Lawar nangka muda dengan bumbu kelapa parut dan rempah Bali.'],
-            ['category_id' => $makanan->id, 'name' => 'Sate Lilit Ikan',          'price' => 20000, 'description' => 'Sate lilit dari daging ikan mujair cincang dengan bumbu khas Bali, 5 tusuk.'],
+            // Minuman
+            ['id_category' => $minuman->id_category, 'name' => 'Air Mineral', 'price' => 5000, 'description' => 'Air mineral dingin/segar.', 'image' => $this->productImage('air-mineral.jpg')],
+            ['id_category' => $minuman->id_category, 'name' => 'Jeruk Hangat', 'price' => 8000, 'description' => 'Minuman jeruk hangat.', 'image' => $this->productImage('jeruk.jpg')],
+            ['id_category' => $minuman->id_category, 'name' => 'Es Jeruk', 'price' => 8000, 'description' => 'Minuman jeruk dingin.', 'image' => $this->productImage('jeruk.jpg')],
+            ['id_category' => $minuman->id_category, 'name' => 'Es Teh / Teh Hangat', 'price' => 6000, 'description' => 'Pilihan es teh atau teh hangat.', 'image' => $this->productImage('es-teh.jpg')],
+            ['id_category' => $minuman->id_category, 'name' => 'Kopi Bali', 'price' => 5000, 'description' => 'Kopi bali hangat.', 'image' => $this->productImage('kopi-bali.jpg')],
 
-            // ── Minuman ───────────────────────────────────────────────────
-            ['category_id' => $minuman->id, 'name' => 'Es Teh Manis',             'price' => 5000,  'description' => 'Teh manis dingin segar.'],
-            ['category_id' => $minuman->id, 'name' => 'Teh Hangat',               'price' => 4000,  'description' => 'Teh hangat manis atau tawar.'],
-            ['category_id' => $minuman->id, 'name' => 'Es Jeruk',                 'price' => 8000,  'description' => 'Jeruk peras segar dengan es batu.'],
-            ['category_id' => $minuman->id, 'name' => 'Jus Alpukat',              'price' => 15000, 'description' => 'Jus alpukat segar dengan susu kental manis.'],
-            ['category_id' => $minuman->id, 'name' => 'Jus Semangka',             'price' => 12000, 'description' => 'Jus semangka segar tanpa gula tambahan.'],
-            ['category_id' => $minuman->id, 'name' => 'Es Kelapa Muda',           'price' => 15000, 'description' => 'Kelapa muda segar langsung dari buahnya.'],
-            ['category_id' => $minuman->id, 'name' => 'Air Mineral',              'price' => 4000,  'description' => 'Air mineral botol 600ml.'],
-            ['category_id' => $minuman->id, 'name' => 'Kopi Hitam',               'price' => 8000,  'description' => 'Kopi hitam robusta Kintamani, diseduh panas.'],
-            ['category_id' => $minuman->id, 'name' => 'Es Kopi Susu',             'price' => 15000, 'description' => 'Kopi susu dingin dengan gula aren, kopi Kintamani.'],
+            // Jus
+            ['id_category' => $jus->id_category, 'name' => 'Alpukat', 'price' => 10000, 'description' => 'Jus alpukat segar.', 'image' => $this->productImage('jus-alpukat.jpg')],
+            ['id_category' => $jus->id_category, 'name' => 'Sirsak', 'price' => 10000, 'description' => 'Jus sirsak segar.', 'image' => $this->productImage('jus-sirsak.jpg')],
+            ['id_category' => $jus->id_category, 'name' => 'Mangga', 'price' => 9000, 'description' => 'Jus mangga segar.', 'image' => $this->productImage('jus-mangga.jpg')],
+            ['id_category' => $jus->id_category, 'name' => 'Wortel', 'price' => 9000, 'description' => 'Jus wortel segar.', 'image' => $this->productImage('jus-wortel.jpg')],
+            ['id_category' => $jus->id_category, 'name' => 'Tomat', 'price' => 9000, 'description' => 'Jus tomat segar.', 'image' => $this->productImage('jus-tomat.jpg')],
+            ['id_category' => $jus->id_category, 'name' => 'Melon', 'price' => 9000, 'description' => 'Jus melon segar.', 'image' => $this->productImage('jus-melon.jpg')],
+            ['id_category' => $jus->id_category, 'name' => 'Semangka', 'price' => 9000, 'description' => 'Jus semangka segar.', 'image' => $this->productImage('jus-semangka.jpg')],
 
-            // ── Camilan ───────────────────────────────────────────────────
-            ['category_id' => $camilan->id, 'name' => 'Kerupuk',                  'price' => 3000,  'description' => 'Kerupuk renyah pelengkap makan.'],
-            ['category_id' => $camilan->id, 'name' => 'Tempe Goreng',             'price' => 8000,  'description' => 'Tempe goreng crispy, 5 potong.'],
-            ['category_id' => $camilan->id, 'name' => 'Tahu Goreng',              'price' => 8000,  'description' => 'Tahu goreng kuning, 4 potong.'],
-            ['category_id' => $camilan->id, 'name' => 'Sambal Matah',             'price' => 5000,  'description' => 'Sambal matah segar dengan irisan bawang, cabai, dan serai.'],
-            ['category_id' => $camilan->id, 'name' => 'Sambal Tomat',             'price' => 5000,  'description' => 'Sambal tomat pedas segar.'],
-
-            // ── Paket Hemat ───────────────────────────────────────────────
-            ['category_id' => $paket->id,   'name' => 'Paket Midori 1',           'price' => 45000, 'description' => 'Ikan Mujair Goreng + Nasi Putih + Es Teh Manis. Hemat Rp 3.000.'],
-            ['category_id' => $paket->id,   'name' => 'Paket Midori 2',           'price' => 48000, 'description' => 'Ikan Mujair Bakar + Nasi Putih + Es Jeruk. Hemat Rp 3.000.'],
-            ['category_id' => $paket->id,   'name' => 'Paket Keluarga',           'price' => 150000,'description' => 'Ikan Mujair Goreng 2 ekor + Nasi Putih 4 porsi + Plecing Kangkung + 4 Es Teh. Untuk 4 orang.'],
+            // Makanan
+            ['id_category' => $makanan->id_category, 'name' => 'Mujair Nyat-Nyat + Nasi', 'price' => 28000, 'description' => 'Mujair nyat-nyat dengan nasi.', 'image' => $this->productImage('mujair-nyat-nyat.jpg')],
+            ['id_category' => $makanan->id_category, 'name' => 'Mujair Plecing + Nasi', 'price' => 23000, 'description' => 'Mujair plecing dengan nasi.', 'image' => $this->productImage('mujair-plecing.jpg')],
+            ['id_category' => $makanan->id_category, 'name' => 'Mujair Sambal Matah + Nasi', 'price' => 23000, 'description' => 'Mujair sambal matah dengan nasi.', 'image' => $this->productImage('mujair-sambal-matah.jpg')],
+            ['id_category' => $makanan->id_category, 'name' => 'Ayam Nyat-Nyat + Nasi', 'price' => 27000, 'description' => 'Ayam nyat-nyat dengan nasi.', 'image' => $this->productImage('ayam-nyat-nyat.jpg')],
+            ['id_category' => $makanan->id_category, 'name' => 'Ayam Plecing + Nasi', 'price' => 23000, 'description' => 'Ayam plecing dengan nasi.', 'image' => $this->productImage('ayam-plecing.jpg')],
+            ['id_category' => $makanan->id_category, 'name' => 'Kentang Goreng', 'price' => 14000, 'description' => 'Kentang goreng renyah.', 'image' => $this->productImage('kentang-goreng.jpg')],
+            ['id_category' => $makanan->id_category, 'name' => 'Sosis Goreng', 'price' => 14000, 'description' => 'Sosis goreng gurih.', 'image' => $this->productImage('sosis-goreng.jpg')],
         ];
 
         foreach ($products as $product) {
-            Product::firstOrCreate(
+            Product::updateOrCreate(
                 ['name' => $product['name']],
                 array_merge($product, ['is_available' => true])
             );
         }
+
+        $officialMenuNames = array_column($products, 'name');
+
+        Product::whereNotIn('name', $officialMenuNames)->delete();
+    }
+
+    private function productImage(string $filename): string
+    {
+        $source = database_path("seeders/assets/products/{$filename}");
+        $target = "products/{$filename}";
+
+        if (is_file($source)) {
+            Storage::disk('public')->put($target, file_get_contents($source));
+        }
+
+        return $target;
     }
 }

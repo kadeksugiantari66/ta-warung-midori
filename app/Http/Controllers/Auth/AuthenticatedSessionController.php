@@ -32,10 +32,10 @@ class AuthenticatedSessionController extends Controller
         $role = $request->user()->role;
 
         return match ($role) {
-            'admin'  => redirect()->route('admin.dashboard'),
-            'kasir'  => redirect()->route('kasir.dashboard'),
-            'dapur'  => redirect()->route('dapur.dashboard'),
-            default  => redirect()->route('dashboard'),
+            'admin' => redirect()->route('admin.dashboard'),
+            'kasir' => redirect()->route('kasir.dashboard'),
+            'dapur' => redirect()->route('dapur.dashboard'),
+            default => redirect()->route('dashboard'),
         };
     }
 
@@ -50,6 +50,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login');
     }
 }

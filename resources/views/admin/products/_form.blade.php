@@ -1,11 +1,11 @@
 {{-- Partial form: dipakai di create & edit --}}
 
-<x-form-field label="Kategori" name="category_id" required>
-    <select name="category_id" id="category_id"
-            class="w-full border-outline-variant rounded-xl bg-surface-container-low px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary @error('category_id') border-error @enderror">
+<x-form-field label="Kategori" name="id_category" required>
+    <select name="id_category" id="id_category"
+            class="w-full border-outline-variant rounded-xl bg-surface-container-low px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary @error('id_category') border-error @enderror">
         <option value="">-- Pilih Kategori --</option>
         @foreach ($categories as $cat)
-            <option value="{{ $cat->id }}" {{ old('category_id', $product->category_id ?? '') == $cat->id ? 'selected' : '' }}>
+            <option value="{{ $cat->id_category }}" {{ old('id_category', $product->id_category ?? '') == $cat->id_category ? 'selected' : '' }}>
                 {{ $cat->name }}
             </option>
         @endforeach

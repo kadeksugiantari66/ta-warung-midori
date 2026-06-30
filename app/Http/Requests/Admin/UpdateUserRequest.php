@@ -15,20 +15,20 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', Rule::unique('users')->ignore($this->user)],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', Rule::unique('staff')->ignore($this->user)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'role'     => ['required', 'in:admin,kasir,dapur'],
+            'role' => ['required', 'in:admin,kasir,dapur'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'name'     => 'nama',
-            'email'    => 'email',
+            'name' => 'nama',
+            'email' => 'email',
             'password' => 'kata sandi',
-            'role'     => 'peran',
+            'role' => 'peran',
         ];
     }
 }

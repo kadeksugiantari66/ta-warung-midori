@@ -36,7 +36,7 @@
                 <tr>
                     <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Nama</th>
                     <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Deskripsi</th>
-                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Menu</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Jml Item</th>
                     <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant text-right">Aksi</th>
                 </tr>
             </thead>
@@ -48,7 +48,7 @@
                         <td class="px-6 py-4 text-sm text-on-surface-variant">{{ $category->products_count }}</td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex justify-end gap-1">
-                                <button @click="editId = {{ $category->id }}; editName = '{{ addslashes($category->name) }}'; editDesc = '{{ addslashes($category->description ?? '') }}'"
+                                <button @click="editId = {{ $category->id_category }}; editName = '{{ addslashes($category->name) }}'; editDesc = '{{ addslashes($category->description ?? '') }}'"
                                         class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors">
                                     <span class="material-symbols-outlined text-base">edit</span>
                                 </button>

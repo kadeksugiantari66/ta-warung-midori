@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Login Staf – Warung Midori</title>
+    <title>Login Staff – Warung Midori</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
@@ -67,7 +67,7 @@
                 <p class="text-on-surface-variant text-sm">Sistem Informasi Penjualan</p>
             </div>
 
-            <h2 class="font-headline font-black text-3xl text-primary mb-2">Login Staf</h2>
+            <h2 class="font-headline font-black text-3xl text-primary mb-2">Login Staff</h2>
             <p class="text-on-surface-variant text-sm mb-8">Masukkan email dan kata sandi akun Anda.</p>
 
             {{-- Session errors --}}
@@ -98,7 +98,7 @@
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">mail</span>
                         <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
                                class="w-full pl-11 pr-4 py-3 border border-outline-variant rounded-2xl bg-surface-container-low text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all @error('email') border-error @enderror"
-                               placeholder="staf@midori.com">
+                               placeholder="staff@midori.com">
                     </div>
                 </div>
 
@@ -114,16 +114,11 @@
                 </div>
 
                 {{-- Remember me --}}
-                <div class="flex items-center justify-between">
+                <div class="flex items-center">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="remember" class="rounded border-outline-variant text-primary focus:ring-primary w-4 h-4">
                         <span class="text-sm text-on-surface-variant">Ingat saya</span>
                     </label>
-                    @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="text-sm text-secondary hover:underline font-medium">
-                            Lupa kata sandi?
-                        </a>
-                    @endif
                 </div>
 
                 {{-- Submit --}}

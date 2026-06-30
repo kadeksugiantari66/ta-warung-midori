@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+            $table->id('id_payment');
+            $table->foreignId('id_order')->constrained('orders', 'id_order')->cascadeOnDelete();
             $table->enum('method', ['tunai', 'midtrans'])->default('tunai');
             $table->decimal('amount', 10, 2);
             $table->enum('status', ['pending', 'paid', 'failed', 'expired'])->default('pending');

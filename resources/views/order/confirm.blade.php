@@ -103,62 +103,16 @@
             <span class="material-symbols-outlined text-3xl block mb-1" style="color:#154212; font-variation-settings:'FILL' 1">check_circle</span>
             <p class="font-bold text-sm" style="color:#154212" x-text="orderCompleted ? 'Pesanan Selesai' : 'Pembayaran Berhasil'"></p>
             <p class="text-xs text-on-surface-variant mt-1" x-text="orderCompleted ? 'Selamat makan!' : 'Pesanan sedang disiapkan.'"></p>
-        </div>
-    </div>
 
-    {{-- Rating & Ulasan — muncul dinamis saat completed --}}
-    <div x-show="orderCompleted" x-cloak
-         class="bg-surface-container-lowest rounded-[1.5rem] border border-outline-variant/10 shadow-[0_4px_24px_rgba(21,66,18,0.05)] p-6">
-        <h3 class="font-headline font-bold text-lg text-primary mb-4">Beri Ulasan Menu</h3>
-
-        <div x-show="reviewSent" class="text-center py-4">
-            <span class="material-symbols-outlined text-4xl text-secondary block mb-2" style="font-variation-settings:'FILL' 1">check_circle</span>
-            <p class="font-semibold text-on-surface">Ulasan terkirim!</p>
-        </div>
-
-        <div x-show="!reviewSent" class="space-y-4">
-            <div>
-                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Pilih Menu</label>
-                <select x-model="selectedProduct"
-                        class="w-full border-outline-variant rounded-xl bg-surface-container-low px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary">
-                    <option value="">-- Pilih menu --</option>
-                    @foreach ($order->orderItems as $item)
-                        <option value="{{ $item->product_id }}">{{ $item->product->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Rating</label>
-                <div class="flex gap-1">
-                    <template x-for="star in [1,2,3,4,5]" :key="star">
-                        <button @click="rating = star" type="button"
-                                :class="star <= rating ? 'text-yellow-400' : 'text-outline-variant'"
-                                class="text-4xl leading-none hover:text-yellow-400 transition-colors">★</button>
-                    </template>
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-on-surface-variant mb-1.5">Komentar (opsional)</label>
-                <textarea x-model="comment" rows="2" placeholder="Bagaimana rasanya?"
-                          class="w-full border-outline-variant rounded-xl bg-surface-container-low px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary"></textarea>
-            </div>
-
-            <button @click="submitReview()" :disabled="!selectedProduct || rating === 0"
-                    class="w-full py-3 bg-primary text-white font-semibold rounded-2xl hover:opacity-90 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed text-sm">
-                Kirim Ulasan
+            {{-- Pelanggan konfirmasi pesanan sudah diterima (muncul saat pesanan siap diantar) --}}
+            <button x-show="status === 'ready' && !orderCompleted" x-cloak
+                    @click="submitComplete()" :disabled="completing"
+                    class="w-full mt-4 py-3.5 font-headline font-bold text-base rounded-2xl shadow-lg active:scale-95 transition-all disabled:opacity-50"
+                    style="background:#154212; color:white">
+                <span x-show="!completing">Konfirmasi Pesanan Selesai</span>
+                <span x-show="completing">Memproses...</span>
             </button>
         </div>
-    </div>
-
-    {{-- Tombol Pesan Lagi — muncul saat completed --}}
-    <div x-show="orderCompleted" x-cloak>
-        <a href="{{ route('order.menu', $order->table) }}"
-           class="flex items-center justify-center gap-2 w-full py-4 bg-primary text-white font-headline font-bold text-base rounded-2xl shadow-lg hover:opacity-90 active:scale-95 transition-all">
-            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">restaurant_menu</span>
-            Pesan Lagi
-        </a>
     </div>
 
     <p class="text-center text-xs text-on-surface-variant pb-4">Warung Midori · Bangli, Bali</p>
@@ -174,6 +128,8 @@ function pageApp() {
         statusLabel: 'Selesaikan pembayaran untuk memproses pesanan.',
         paid: {{ $order->payment?->status === 'paid' ? 'true' : 'false' }},
         orderCompleted: {{ $order->status === 'completed' ? 'true' : 'false' }},
+        status: '{{ $order->status }}',
+        completing: false,
         loading: false,
         snapToken: null,
         paymentError: null,
@@ -199,12 +155,30 @@ function pageApp() {
                 const data = await res.json();
 
                 this.statusLabel = data.label;
+                this.status = data.status;
                 if (data.paid) this.paid = true;
                 if (data.status === 'completed') {
-                    this.orderCompleted = true;
                     clearInterval(this.timer);
+                    window.location.href = '{{ route('order.thanks', $order) }}';
                 }
             } catch(e) {}
+        },
+
+        async submitComplete() {
+            this.completing = true;
+            try {
+                const res = await fetch('{{ route('order.complete', $order) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                });
+                const data = await res.json();
+                if (data.success) {
+                    clearInterval(this.timer);
+                    window.location.href = '{{ route('order.thanks', $order) }}';
+                    return;
+                }
+            } catch(e) {}
+            this.completing = false;
         },
 
         async loadSnap() {
@@ -253,7 +227,7 @@ function pageApp() {
             const res = await fetch('{{ route('order.review') }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: JSON.stringify({ product_id: this.selectedProduct, rating: this.rating, comment: this.comment }),
+                body: JSON.stringify({ id_menu: this.selectedProduct, rating: this.rating, comment: this.comment }),
             });
             if (res.ok) this.reviewSent = true;
         }

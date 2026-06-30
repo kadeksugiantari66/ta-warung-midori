@@ -105,12 +105,12 @@
     <nav class="flex-1 space-y-1 px-2">
         @if(auth()->user()->isAdmin())
             <x-sidenav-link href="{{ route('admin.dashboard') }}" icon="dashboard" :active="request()->routeIs('admin.dashboard')">Dashboard</x-sidenav-link>
-            <x-sidenav-link href="{{ route('admin.products.index') }}" icon="restaurant_menu" :active="request()->routeIs('admin.products.*')">Menu</x-sidenav-link>
+            <x-sidenav-link href="{{ route('admin.users.index') }}" icon="group" :active="request()->routeIs('admin.users.*')">Staff</x-sidenav-link>
             <x-sidenav-link href="{{ route('admin.categories.index') }}" icon="category" :active="request()->routeIs('admin.categories.*')">Kategori</x-sidenav-link>
+            <x-sidenav-link href="{{ route('admin.products.index') }}" icon="restaurant_menu" :active="request()->routeIs('admin.products.*')">Menu</x-sidenav-link>
             <x-sidenav-link href="{{ route('admin.tables.index') }}" icon="table_restaurant" :active="request()->routeIs('admin.tables.*')">Meja & QR</x-sidenav-link>
-            <x-sidenav-link href="{{ route('admin.reports.daily') }}" icon="bar_chart" :active="request()->routeIs('admin.reports.*')">Laporan</x-sidenav-link>
-            <x-sidenav-link href="{{ route('admin.users.index') }}" icon="group" :active="request()->routeIs('admin.users.*')">Staf</x-sidenav-link>
             <x-sidenav-link href="{{ route('admin.reviews.index') }}" icon="star" :active="request()->routeIs('admin.reviews.*')">Ulasan</x-sidenav-link>
+            <x-sidenav-link href="{{ route('admin.reports.daily') }}" icon="bar_chart" :active="request()->routeIs('admin.reports.*')">Laporan</x-sidenav-link>
         @elseif(auth()->user()->isKasir())
             <x-sidenav-link href="{{ route('kasir.dashboard') }}" icon="dashboard" :active="request()->routeIs('kasir.dashboard')">Dashboard</x-sidenav-link>
         @elseif(auth()->user()->isDapur())

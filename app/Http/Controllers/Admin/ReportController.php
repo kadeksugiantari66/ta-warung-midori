@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\ReportExport;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
@@ -9,7 +10,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ReportExport;
 
 class ReportController extends Controller
 {
@@ -18,7 +18,7 @@ class ReportController extends Controller
      */
     public function daily(Request $request): View
     {
-        $date   = $request->date ?? today()->toDateString();
+        $date = $request->date ?? today()->toDateString();
         $orders = $this->getOrders($date, $date);
         $summary = $this->getSummary($orders);
 
@@ -62,7 +62,7 @@ class ReportController extends Controller
 
         $products = Product::with('category')
             ->withCount(['orderItems as total_ordered' => function ($q) use ($year, $mon) {
-                $q->whereHas('order', fn($o) => $o->whereYear('created_at', $year)->whereMonth('created_at', $mon));
+                $q->whereHas('order', fn ($o) => $o->whereYear('created_at', $year)->whereMonth('created_at', $mon));
             }])
             ->orderByDesc('total_ordered')
             ->take(10)
@@ -72,16 +72,82 @@ class ReportController extends Controller
     }
 
     /**
-     * Fungsi buat otomatis mencetak laporan jadi file PDF.
+     * Export PDF laporan harian — profesional & siap cetak.
      */
-    public function exportPdf(Request $request)
+    public function exportDailyPdf(Request $request)
     {
-        $date   = $request->date ?? today()->toDateString();
+        $date = $request->date ?? today()->toDateString();
         $orders = $this->getOrders($date, $date);
         $summary = $this->getSummary($orders);
 
-        $pdf = Pdf::loadView('admin.reports.pdf', compact('orders', 'summary', 'date'));
-        return $pdf->download("laporan-{$date}.pdf");
+        $pdf = Pdf::loadView('admin.reports.pdf-daily', compact('orders', 'summary', 'date'));
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download("Laporan-Harian-{$date}.pdf");
+    }
+
+    /**
+     * Export PDF laporan bulanan — dengan ringkasan & tren harian.
+     */
+    public function exportMonthlyPdf(Request $request)
+    {
+        $month = $request->month ?? today()->format('Y-m');
+        [$year, $mon] = explode('-', $month);
+
+        $orders = $this->getOrders(
+            "{$year}-{$mon}-01",
+            date('Y-m-t', mktime(0, 0, 0, $mon, 1, $year))
+        );
+
+        $summary = $this->getSummary($orders);
+
+        $dailyTrend = Order::selectRaw('DATE(created_at) as date, COUNT(*) as total_orders, SUM(total_amount) as revenue')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $mon)
+            ->where('status', 'completed')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.reports.pdf-monthly', compact('orders', 'summary', 'month', 'dailyTrend'));
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download("Laporan-Bulanan-{$month}.pdf");
+    }
+
+    /**
+     * Export PDF menu terlaris — ranking & kontribusi pendapatan.
+     */
+    public function exportTopProductsPdf(Request $request)
+    {
+        $month = $request->month ?? today()->format('Y-m');
+        [$year, $mon] = explode('-', $month);
+
+        $products = Product::with('category')
+            ->withCount(['orderItems as total_ordered' => function ($q) use ($year, $mon) {
+                $q->whereHas('order', fn ($o) => $o->whereYear('created_at', $year)->whereMonth('created_at', $mon));
+            }])
+            ->withSum(['orderItems as total_revenue' => function ($q) use ($year, $mon) {
+                $q->whereHas('order', fn ($o) => $o->whereYear('created_at', $year)->whereMonth('created_at', $mon));
+            }], 'subtotal')
+            ->orderByDesc('total_ordered')
+            ->get();
+
+        $totalOrderedAll = $products->sum('total_ordered');
+        $totalRevenueAll = $products->sum('total_revenue');
+
+        $pdf = Pdf::loadView('admin.reports.pdf-top-products', compact('products', 'month', 'totalOrderedAll', 'totalRevenueAll'));
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download("Laporan-Menu-Terlaris-{$month}.pdf");
+    }
+
+    /**
+     * Fungsi buat otomatis mencetak laporan jadi file PDF (kompatibilitas lama).
+     */
+    public function exportPdf(Request $request)
+    {
+        return $this->exportDailyPdf($request);
     }
 
     /**
@@ -90,6 +156,7 @@ class ReportController extends Controller
     public function exportExcel(Request $request)
     {
         $date = $request->date ?? today()->toDateString();
+
         return Excel::download(new ReportExport($date), "laporan-{$date}.xlsx");
     }
 
@@ -106,11 +173,11 @@ class ReportController extends Controller
     private function getSummary($orders): array
     {
         return [
-            'total_orders'   => $orders->count(),
-            'completed'      => $orders->where('status', 'completed')->count(),
-            'revenue'        => $orders->where('status', 'completed')->sum('total_amount'),
-            'cash_revenue'   => $orders->filter(fn($o) => $o->payment?->method === 'tunai' && $o->payment?->status === 'paid')->sum('total_amount'),
-            'digital_revenue'=> $orders->filter(fn($o) => $o->payment?->method === 'midtrans' && $o->payment?->status === 'paid')->sum('total_amount'),
+            'total_orders' => $orders->count(),
+            'completed' => $orders->where('status', 'completed')->count(),
+            'revenue' => $orders->where('status', 'completed')->sum('total_amount'),
+            'cash_revenue' => $orders->filter(fn ($o) => $o->payment?->method === 'tunai' && $o->payment?->status === 'paid')->sum('total_amount'),
+            'digital_revenue' => $orders->filter(fn ($o) => $o->payment?->method === 'midtrans' && $o->payment?->status === 'paid')->sum('total_amount'),
         ];
     }
 }

@@ -32,9 +32,9 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
         return [
             $order->queue_number,
             $order->table->table_number,
-            $order->orderItems->map(fn($i) => $i->quantity.'x '.$i->product->name)->join(', '),
+            $order->orderItems->map(fn ($i) => $i->quantity.'x '.$i->product->name)->join(', '),
             $order->total_amount,
-            $order->payment?->method === 'cash' ? 'Tunai' : 'Digital',
+            $order->payment?->method === 'tunai' ? 'Tunai' : 'Digital',
             ucfirst($order->status),
             $order->created_at->format('H:i'),
         ];

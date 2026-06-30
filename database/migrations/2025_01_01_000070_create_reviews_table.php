@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reviews', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->id('id_review');
+            $table->foreignId('id_menu')->constrained('menu', 'id_menu')->cascadeOnDelete();
             $table->tinyInteger('rating'); // 1-5
             $table->text('comment')->nullable();
             $table->timestamps();

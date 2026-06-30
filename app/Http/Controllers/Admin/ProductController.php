@@ -15,7 +15,6 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::with('category')
-            ->withCount('orderItems')
             ->latest()
             ->paginate(10);
 
@@ -25,17 +24,18 @@ class ProductController extends Controller
     public function create(): View
     {
         $categories = Category::orderBy('name')->get();
+
         return view('admin.products.create', compact('categories'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'category_id'  => ['required', 'exists:categories,id'],
-            'name'         => ['required', 'string', 'max:255'],
-            'description'  => ['nullable', 'string'],
-            'price'        => ['required', 'numeric', 'min:0'],
-            'image'        => ['nullable', 'image', 'max:2048'],
+            'id_category' => ['required', 'exists:categories,id_category'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'image' => ['nullable', 'image', 'max:2048'],
             'is_available' => ['boolean'],
         ]);
 
@@ -54,23 +54,25 @@ class ProductController extends Controller
     public function show(Product $product): View
     {
         $product->load(['category', 'reviews', 'orderItems']);
+
         return view('admin.products.show', compact('product'));
     }
 
     public function edit(Product $product): View
     {
         $categories = Category::orderBy('name')->get();
+
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product): RedirectResponse
     {
         $data = $request->validate([
-            'category_id'  => ['required', 'exists:categories,id'],
-            'name'         => ['required', 'string', 'max:255'],
-            'description'  => ['nullable', 'string'],
-            'price'        => ['required', 'numeric', 'min:0'],
-            'image'        => ['nullable', 'image', 'max:2048'],
+            'id_category' => ['required', 'exists:categories,id_category'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'image' => ['nullable', 'image', 'max:2048'],
             'is_available' => ['boolean'],
         ]);
 
@@ -107,7 +109,7 @@ class ProductController extends Controller
      */
     public function toggleAvailability(Product $product): RedirectResponse
     {
-        $product->update(['is_available' => !$product->is_available]);
+        $product->update(['is_available' => ! $product->is_available]);
         $status = $product->is_available ? 'tersedia' : 'habis';
 
         return back()->with('success', "{$product->name} ditandai sebagai {$status}.");

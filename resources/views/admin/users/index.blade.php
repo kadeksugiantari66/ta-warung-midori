@@ -1,12 +1,12 @@
 <x-app-layout>
 <div class="flex justify-between items-center mb-8">
     <div>
-        <h2 class="font-headline text-3xl font-black text-primary">Manajemen Staf</h2>
-        <p class="text-on-surface-variant text-sm mt-1">Kelola akun dan hak akses staf.</p>
+        <h2 class="font-headline text-3xl font-black text-primary">Manajemen Staff</h2>
+        <p class="text-on-surface-variant text-sm mt-1">Kelola akun dan hak akses staff.</p>
     </div>
     <a href="{{ route('admin.users.create') }}"
        class="flex items-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:opacity-90 active:scale-95 transition-all">
-        <span class="material-symbols-outlined text-base">person_add</span> Tambah Staf
+        <span class="material-symbols-outlined text-base">person_add</span> Tambah Staff
     </a>
 </div>
 
@@ -49,23 +49,28 @@
                             {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end items-center gap-2">
+                    <td class="px-6 py-4">
+                        <div class="flex justify-end items-center gap-1">
                             <a href="{{ route('admin.users.edit', $user) }}"
-                               class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors">
+                               class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors"
+                               title="Edit">
                                 <span class="material-symbols-outlined text-base">edit</span>
                             </a>
-                            @if ($user->id !== auth()->id())
-                                <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}" class="inline">
+                            @if ($user->id_staff !== auth()->id())
+                                <form method="POST" action="{{ route('admin.users.toggle-active', $user) }}" class="contents">
                                     @csrf @method('PATCH')
-                                    <button type="submit" class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors" title="{{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                    <button type="submit"
+                                            class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors"
+                                            title="{{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
                                         <span class="material-symbols-outlined text-base">{{ $user->is_active ? 'block' : 'check_circle' }}</span>
                                     </button>
                                 </form>
-                                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="inline"
+                                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="contents"
                                       data-confirm="Hapus akun {{ $user->name }}?">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="p-2 text-error hover:bg-error-container rounded-lg transition-colors">
+                                    <button type="submit"
+                                            class="p-2 text-error hover:bg-error-container rounded-lg transition-colors"
+                                            title="Hapus">
                                         <span class="material-symbols-outlined text-base">delete</span>
                                     </button>
                                 </form>
@@ -74,7 +79,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="5" class="px-6 py-12 text-center text-on-surface-variant">Belum ada staf.</td></tr>
+                <tr><td colspan="5" class="px-6 py-12 text-center text-on-surface-variant">Belum ada staff.</td></tr>
             @endforelse
         </tbody>
     </table>

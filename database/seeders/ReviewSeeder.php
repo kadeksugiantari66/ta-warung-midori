@@ -25,13 +25,13 @@ class ReviewSeeder extends Seeder
             $reviewCount = rand(3, 8);
             for ($i = 0; $i < $reviewCount; $i++) {
                 // Distribusi rating: lebih banyak 4-5
-                $rating  = collect([5,5,5,4,4,4,3,2,1])->random();
+                $rating = collect([5, 5, 5, 4, 4, 4, 3, 2, 1])->random();
                 $comment = collect($comments[$rating])->random();
 
                 Review::create([
-                    'product_id' => $product->id,
-                    'rating'     => $rating,
-                    'comment'    => $comment,
+                    'id_menu' => $product->id_menu,
+                    'rating' => $rating,
+                    'comment' => $comment,
                     'created_at' => now()->subDays(rand(0, 30)),
                 ]);
             }

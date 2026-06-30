@@ -1,5 +1,5 @@
 <x-app-layout>
-<x-form-card title="Tambah Akun Staf" :back="route('admin.users.index')">
+<x-form-card title="Tambah Akun Staff" :back="route('admin.users.index')">
     <form method="POST" action="{{ route('admin.users.store') }}">
         @csrf
 

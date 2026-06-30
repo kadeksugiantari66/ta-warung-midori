@@ -13,13 +13,14 @@ class CategoryController extends Controller
     public function index(): View
     {
         $categories = Category::withCount('products')->latest()->paginate(10);
+
         return view('admin.categories.index', compact('categories'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name'        => ['required', 'string', 'max:100', 'unique:categories,name'],
+            'name' => ['required', 'string', 'max:100', 'unique:categories,name'],
             'description' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -32,7 +33,7 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category): RedirectResponse
     {
         $request->validate([
-            'name'        => ['required', 'string', 'max:100', 'unique:categories,name,' . $category->id],
+            'name' => ['required', 'string', 'max:100', 'unique:categories,name,'.$category->id_category.',id_category'],
             'description' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -49,6 +50,7 @@ class CategoryController extends Controller
         }
 
         $category->delete();
+
         return redirect()->route('admin.categories.index')
             ->with('success', 'Kategori berhasil dihapus.');
     }

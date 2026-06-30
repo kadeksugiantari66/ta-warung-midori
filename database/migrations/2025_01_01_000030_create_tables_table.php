@@ -8,10 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tables', function (Blueprint $table) {
-            $table->id();
+        Schema::create('meja', function (Blueprint $table) {
+            $table->id('id_meja');
             $table->string('table_number')->unique();
             $table->string('qr_code_path')->nullable();
+            $table->string('qr_token')->nullable(); // token QR dinamis (rotasi tiap pesanan selesai)
             $table->enum('status', ['available', 'occupied'])->default('available');
             $table->timestamps();
         });
@@ -19,6 +20,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('tables');
+        Schema::dropIfExists('meja');
     }
 };
