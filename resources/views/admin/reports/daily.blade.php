@@ -6,7 +6,7 @@
         <p class="text-on-surface-variant text-sm mt-1">Detail transaksi per hari.</p>
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('admin.reports.export.pdf', ['date' => $date]) }}"
+        <a href="{{ route('admin.reports.export.pdf', ['date' => $date]) }}" target="_blank"
            class="flex items-center gap-2 bg-error-container text-on-error-container text-sm font-semibold px-4 py-2.5 rounded-xl hover:opacity-90 transition-all">
             <span class="material-symbols-outlined text-base">picture_as_pdf</span> PDF
         </a>

@@ -85,6 +85,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
 // Routing Halaman Pelanggan (scan QR tanpa login)
 Route::prefix('order')->name('order.')->group(function () {
+    // Simulasi pelanggan (demo): pilih meja acak yang tersedia lalu buka menunya
+    Route::get('/simulasi', [OrderController::class, 'simulasi'])->name('simulasi');
     Route::get('/menu/{table}', [OrderController::class, 'menu'])->name('menu');
     Route::post('/menu/{table}', [OrderController::class, 'store'])->name('store');
     Route::get('/confirm/{order}', [OrderController::class, 'confirm'])->name('confirm');

@@ -40,20 +40,22 @@
                     </div>
 
                     @if ($table->qr_code_path)
-                        {{-- QR clickable → popup --}}
+                        {{-- QR clickable → popup. ?v=updated_at = cache-buster supaya browser tidak
+                             menyajikan gambar QR lama setelah tombol "Buat Ulang QR" ditekan. --}}
+                        @php $qrSrc = Storage::url($table->qr_code_path).'?v='.optional($table->updated_at)->timestamp; @endphp
                         <button @click="activeQr = {
-                                    src: '{{ Storage::url($table->qr_code_path) }}',
+                                    src: '{{ $qrSrc }}',
                                     table: '{{ $table->table_number }}',
-                                    download: '{{ Storage::url($table->qr_code_path) }}',
+                                    download: '{{ $qrSrc }}',
                                     url: '{{ route('order.menu', $table) }}',
                                     printUrl: '{{ route('admin.tables.print-qr', $table) }}'
                                 }"
                                 class="block mx-auto my-3 hover:scale-105 transition-transform cursor-zoom-in">
-                            <img src="{{ Storage::url($table->qr_code_path) }}"
+                            <img src="{{ $qrSrc }}"
                                  alt="QR Meja {{ $table->table_number }}"
                                  class="w-28 h-28 mx-auto rounded-xl">
                         </button>
-                        <a href="{{ Storage::url($table->qr_code_path) }}"
+                        <a href="{{ $qrSrc }}"
                            download="qr_meja_{{ $table->table_number }}.svg"
                            class="text-xs font-semibold text-secondary hover:underline block mb-3">
                             Download QR

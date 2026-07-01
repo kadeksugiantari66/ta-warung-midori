@@ -11,72 +11,61 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         [x-cloak] { display: none !important; }
+        html, body { height: 100%; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24; }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900 font-['Inter']" x-data="scannerApp()">
-    <main class="min-h-screen flex items-center justify-center px-4">
-        <section class="w-full max-w-md rounded-2xl bg-white border border-slate-200 shadow-sm p-6">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Pelanggan</p>
-            <h1 class="mt-2 text-2xl font-bold text-slate-900">Scan QR Meja</h1>
-            <p class="mt-2 text-sm text-slate-600">Klik tombol di bawah, izinkan kamera, lalu arahkan ke QR di meja.</p>
+<body class="h-full overflow-hidden bg-black text-white font-['Inter']" x-data="scannerApp()" x-init="start()">
 
-            <button @click="openScanner()"
-                    class="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 text-white font-semibold hover:bg-emerald-800 active:scale-[0.99] transition">
-                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">qr_code_scanner</span>
-                Scan Sekarang
-            </button>
-        </section>
-    </main>
+    {{-- Kamera full layar --}}
+    <video id="qr-video" class="fixed inset-0 h-full w-full object-cover" playsinline autoplay muted></video>
+    <canvas id="qr-canvas" class="hidden"></canvas>
 
-    <div x-show="showScanner" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
-        <div class="w-full max-w-sm overflow-hidden rounded-2xl bg-white">
-            <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                <h2 class="text-base font-semibold text-slate-900">Arahkan ke QR Meja</h2>
-                <button @click="closeScanner()" class="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
+    {{-- Header atas --}}
+    <div x-show="!cameraError"
+         class="fixed inset-x-0 top-0 z-10 bg-gradient-to-b from-black/70 to-transparent px-5 pb-12 pt-7 text-center">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Pelanggan</p>
+        <h1 class="mt-1 text-xl font-bold">Scan QR Meja</h1>
+    </div>
 
-            <div class="relative bg-black" style="aspect-ratio: 1 / 1">
-                <video id="qr-video" class="h-full w-full object-cover" playsinline autoplay muted></video>
-                <canvas id="qr-canvas" class="hidden"></canvas>
+    {{-- Keterangan bawah --}}
+    <div x-show="!cameraError"
+         class="fixed inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/75 to-transparent px-5 pb-9 pt-14 text-center">
+        <p class="inline-flex items-center gap-2 text-base font-semibold">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">qr_code_scanner</span>
+            Scan QR di meja
+        </p>
+        <p class="mt-1 text-xs text-white/70" x-text="scanStatus"></p>
+    </div>
 
-                <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <div class="h-52 w-52 rounded-2xl border-2 border-emerald-300/80"></div>
-                </div>
-
-                <div x-show="cameraError" class="absolute inset-0 flex items-center justify-center bg-black/80 px-6 text-center text-sm text-white">
-                    <p x-text="cameraError"></p>
-                </div>
-            </div>
-
-            <div class="px-4 py-3 text-center text-sm text-slate-600" x-text="scanStatus"></div>
-        </div>
+    {{-- Overlay error / izin kamera (full layar) --}}
+    <div x-show="cameraError" x-cloak
+         class="fixed inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-slate-900 px-6 text-center">
+        <span class="material-symbols-outlined text-5xl text-white/80">no_photography</span>
+        <p class="max-w-xs text-sm text-white/90" x-text="cameraError"></p>
+        <button @click="start()"
+                class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold hover:bg-emerald-700 active:scale-95 transition">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">photo_camera</span>
+            Izinkan Kamera
+        </button>
     </div>
 
     <script>
         function scannerApp() {
             return {
-                showScanner: false,
                 cameraError: null,
-                scanStatus: 'Menunggu kamera...',
+                scanStatus: 'Menyalakan kamera...',
                 stream: null,
                 animFrame: null,
 
-                openScanner() {
-                    this.showScanner = true;
+                start() {
                     this.cameraError = null;
-                    this.scanStatus = 'Memulai kamera...';
+                    this.scanStatus = 'Menyalakan kamera...';
                     this.$nextTick(() => this.startCamera());
                 },
 
-                closeScanner() {
-                    this.stopCamera();
-                    this.showScanner = false;
-                },
-
                 async startCamera() {
+                    this.stopCamera();
                     try {
                         this.stream = await navigator.mediaDevices.getUserMedia({
                             video: { facingMode: 'environment' }
@@ -90,13 +79,15 @@
                             this.scanFrame();
                         };
                     } catch (error) {
-                        this.cameraError = 'Tidak bisa akses kamera. Pastikan izin kamera diaktifkan.';
+                        this.cameraError = 'Tidak bisa akses kamera. Ketuk "Izinkan Kamera" dan izinkan aksesnya.';
+                        this.scanStatus = '';
                     }
                 },
 
                 stopCamera() {
                     if (this.animFrame) {
                         cancelAnimationFrame(this.animFrame);
+                        this.animFrame = null;
                     }
                     if (this.stream) {
                         this.stream.getTracks().forEach(track => track.stop());
@@ -108,7 +99,7 @@
                     const video = document.getElementById('qr-video');
                     const canvas = document.getElementById('qr-canvas');
 
-                    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+                    if (!video || video.readyState !== video.HAVE_ENOUGH_DATA) {
                         this.animFrame = requestAnimationFrame(() => this.scanFrame());
                         return;
                     }

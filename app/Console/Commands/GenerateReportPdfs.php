@@ -38,7 +38,7 @@ class GenerateReportPdfs extends Command
         $summary = $this->dailySummary();
         $orders = $this->dailyOrders();
 
-        $pdf = Pdf::loadView('reports.pdf-daily', compact('orders', 'summary', 'date'));
+        $pdf = Pdf::loadView('admin.reports.pdf-daily', compact('orders', 'summary', 'date'));
         $pdf->setPaper('A4', 'portrait');
 
         Storage::disk('public')->put('reports/Laporan-Harian-12-Juni-2026.pdf', $pdf->output());
@@ -49,9 +49,10 @@ class GenerateReportPdfs extends Command
         $month = '2026-05';
         $summary = $this->monthlySummary();
         $orders = $this->monthlyOrders();
-        $dailyTrend = $this->dailyTrendData();
+        // Samakan bentuk dgn data live: Collection berisi objek (punya ->date, ->total_orders, ->revenue)
+        $dailyTrend = collect($this->dailyTrendData())->map(fn ($d) => (object) $d);
 
-        $pdf = Pdf::loadView('reports.pdf-monthly', compact('orders', 'summary', 'month', 'dailyTrend'));
+        $pdf = Pdf::loadView('admin.reports.pdf-monthly', compact('orders', 'summary', 'month', 'dailyTrend'));
         $pdf->setPaper('A4', 'portrait');
 
         Storage::disk('public')->put('reports/Laporan-Bulanan-Mei-2026.pdf', $pdf->output());
@@ -60,11 +61,18 @@ class GenerateReportPdfs extends Command
     private function generateTopProductsPdf(): void
     {
         $month = '2026-05';
-        $products = $this->topProductsData();
-        $totalOrderedAll = collect($products)->sum('total_ordered');
-        $totalRevenueAll = collect($products)->sum('total_revenue');
+        // Samakan bentuk dgn data live: Collection Product-like objek (punya ->name, ->category->name, dst)
+        $products = collect($this->topProductsData())->map(fn ($d) => (object) [
+            'name' => $d['name'],
+            'category' => (object) ['name' => $d['category']],
+            'price' => $d['price'],
+            'total_ordered' => $d['total_ordered'],
+        ]);
+        // TOTAL = jumlah baris "Terjual", supaya cocok dengan kolomnya
+        $totalOrderedAll = $products->sum('total_ordered');
+        $totalRevenueAll = collect($this->topProductsData())->sum('total_revenue');
 
-        $pdf = Pdf::loadView('reports.pdf-top-products', compact('products', 'month', 'totalOrderedAll', 'totalRevenueAll'));
+        $pdf = Pdf::loadView('admin.reports.pdf-top-products', compact('products', 'month', 'totalOrderedAll', 'totalRevenueAll'));
         $pdf->setPaper('A4', 'portrait');
 
         Storage::disk('public')->put('reports/Laporan-Menu-Terlaris-Mei-2026.pdf', $pdf->output());
@@ -86,17 +94,17 @@ class GenerateReportPdfs extends Command
     private function dailyOrders(): array
     {
         return [
-            ['queue' => '0156', 'table' => 'M01', 'items' => '2× Mujair Nyat-Nyat + Nasi, 1× Es Jeruk',                                  'total' => 64000,  'method' => 'Tunai',     'time' => '10:15'],
-            ['queue' => '0157', 'table' => 'M03', 'items' => '1× Ayam Plecing + Nasi, 1× Es Teh / Teh Hangat, 1× Kentang Goreng',       'total' => 43000,  'method' => 'Digital',   'time' => '10:42'],
-            ['queue' => '0158', 'table' => 'M07', 'items' => '1× Ayam Nyat-Nyat + Nasi, 2× Jus Alpukat',                                'total' => 47000,  'method' => 'Tunai',     'time' => '11:05'],
-            ['queue' => '0159', 'table' => 'M02', 'items' => '1× Mujair Plecing + Nasi, 1× Sosis Goreng, 1× Kopi Bali',                 'total' => 42000,  'method' => 'Digital',   'time' => '11:38'],
-            ['queue' => '0160', 'table' => 'M05', 'items' => '3× Mujair Sambal Matah + Nasi, 2× Air Mineral',                            'total' => 79000,  'method' => 'Tunai',     'time' => '12:20'],
-            ['queue' => '0161', 'table' => 'M10', 'items' => '1× Mujair Nyat-Nyat + Nasi, 1× Jeruk Hangat, 1× Jus Sirsak',              'total' => 46000,  'method' => 'Tunai',     'time' => '12:55'],
-            ['queue' => '0162', 'table' => 'M04', 'items' => '1× Ayam Nyat-Nyat + Nasi, 1× Es Teh / Teh Hangat',                        'total' => 33000,  'method' => 'Digital',   'time' => '13:18'],
-            ['queue' => '0163', 'table' => 'M01', 'items' => '1× Mujair Nyat-Nyat + Nasi, 1× Kentang Goreng, 1× Jus Mangga',            'total' => 51000,  'method' => 'Tunai',     'time' => '13:45'],
-            ['queue' => '0164', 'table' => 'M09', 'items' => '1× Ayam Plecing + Nasi, 1× Sosis Goreng, 1× Jus Semangka',                'total' => 46000,  'method' => 'Digital',   'time' => '14:10'],
-            ['queue' => '0165', 'table' => 'M06', 'items' => '1× Mujair Plecing + Nasi, 1× Es Jeruk, 1× Jus Melon',                     'total' => 40000,  'method' => 'Tunai',     'time' => '14:35'],
-            ['queue' => '0166', 'table' => 'M08', 'items' => '2× Ayam Nyat-Nyat + Nasi, 1× Jus Wortel, 1× Jus Tomat',                   'total' => 72000,  'method' => 'Tunai',     'time' => '15:00'],
+            ['queue' => '0156', 'table' => 'M01', 'items' => '2x Mujair Nyat-Nyat + Nasi, 1x Es Jeruk',                                  'total' => 64000,  'method' => 'Tunai',     'time' => '10:15'],
+            ['queue' => '0157', 'table' => 'M03', 'items' => '1x Ayam Plecing + Nasi, 1x Es Teh / Teh Hangat, 1x Kentang Goreng',       'total' => 43000,  'method' => 'Digital',   'time' => '10:42'],
+            ['queue' => '0158', 'table' => 'M07', 'items' => '1x Ayam Nyat-Nyat + Nasi, 2x Jus Alpukat',                                'total' => 47000,  'method' => 'Tunai',     'time' => '11:05'],
+            ['queue' => '0159', 'table' => 'M02', 'items' => '1x Mujair Plecing + Nasi, 1x Sosis Goreng, 1x Kopi Bali',                 'total' => 42000,  'method' => 'Digital',   'time' => '11:38'],
+            ['queue' => '0160', 'table' => 'M05', 'items' => '3x Mujair Sambal Matah + Nasi, 2x Air Mineral',                            'total' => 79000,  'method' => 'Tunai',     'time' => '12:20'],
+            ['queue' => '0161', 'table' => 'M10', 'items' => '1x Mujair Nyat-Nyat + Nasi, 1x Jeruk Hangat, 1x Jus Sirsak',              'total' => 46000,  'method' => 'Tunai',     'time' => '12:55'],
+            ['queue' => '0162', 'table' => 'M04', 'items' => '1x Ayam Nyat-Nyat + Nasi, 1x Es Teh / Teh Hangat',                        'total' => 33000,  'method' => 'Digital',   'time' => '13:18'],
+            ['queue' => '0163', 'table' => 'M01', 'items' => '1x Mujair Nyat-Nyat + Nasi, 1x Kentang Goreng, 1x Jus Mangga',            'total' => 51000,  'method' => 'Tunai',     'time' => '13:45'],
+            ['queue' => '0164', 'table' => 'M09', 'items' => '1x Ayam Plecing + Nasi, 1x Sosis Goreng, 1x Jus Semangka',                'total' => 46000,  'method' => 'Digital',   'time' => '14:10'],
+            ['queue' => '0165', 'table' => 'M06', 'items' => '1x Mujair Plecing + Nasi, 1x Es Jeruk, 1x Jus Melon',                     'total' => 40000,  'method' => 'Tunai',     'time' => '14:35'],
+            ['queue' => '0166', 'table' => 'M08', 'items' => '2x Ayam Nyat-Nyat + Nasi, 1x Jus Wortel, 1x Jus Tomat',                   'total' => 72000,  'method' => 'Tunai',     'time' => '15:00'],
         ];
     }
 
@@ -105,9 +113,9 @@ class GenerateReportPdfs extends Command
         return [
             'total_orders' => 312,
             'completed' => 305,
-            'revenue' => 48350000,
-            'cash_revenue' => 31825000,
-            'digital_revenue' => 16525000,
+            'revenue' => 48980000,
+            'cash_revenue' => 32180000,
+            'digital_revenue' => 16800000,
         ];
     }
 

@@ -77,13 +77,28 @@ class ReportController extends Controller
     public function exportDailyPdf(Request $request)
     {
         $date = $request->date ?? today()->toDateString();
-        $orders = $this->getOrders($date, $date);
-        $summary = $this->getSummary($orders);
+
+        $orders = $this->getOrders($date, $date)
+            ->where('status', 'completed')
+            ->sortBy('created_at')
+            ->map(fn ($o) => [
+                'queue' => str_pad((string) $o->queue_number, 4, '0', STR_PAD_LEFT),
+                'table' => $o->table?->table_number ?? '-',
+                'items' => $o->orderItems->map(fn ($it) => $it->quantity.'x '.($it->product?->name ?? 'Menu'))->implode(', '),
+                'method' => $o->payment?->method === 'tunai' ? 'Tunai' : 'Digital',
+                'time' => $o->created_at->format('H:i'),
+                'total' => (int) $o->total_amount,
+            ])->values()->all();
+
+        $summary = [
+            'total_orders' => count($orders),
+            'revenue' => array_sum(array_column($orders, 'total')),
+        ];
 
         $pdf = Pdf::loadView('admin.reports.pdf-daily', compact('orders', 'summary', 'date'));
         $pdf->setPaper('A4', 'portrait');
 
-        return $pdf->download("Laporan-Harian-{$date}.pdf");
+        return $pdf->stream("Laporan-Harian-{$date}.pdf");
     }
 
     /**
@@ -112,7 +127,7 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('admin.reports.pdf-monthly', compact('orders', 'summary', 'month', 'dailyTrend'));
         $pdf->setPaper('A4', 'portrait');
 
-        return $pdf->download("Laporan-Bulanan-{$month}.pdf");
+        return $pdf->stream("Laporan-Bulanan-{$month}.pdf");
     }
 
     /**
@@ -131,7 +146,9 @@ class ReportController extends Controller
                 $q->whereHas('order', fn ($o) => $o->whereYear('created_at', $year)->whereMonth('created_at', $mon));
             }], 'subtotal')
             ->orderByDesc('total_ordered')
-            ->get();
+            ->get()
+            ->filter(fn ($p) => $p->total_ordered > 0)  // hanya menu yang benar-benar terjual
+            ->values();
 
         $totalOrderedAll = $products->sum('total_ordered');
         $totalRevenueAll = $products->sum('total_revenue');
@@ -139,7 +156,7 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('admin.reports.pdf-top-products', compact('products', 'month', 'totalOrderedAll', 'totalRevenueAll'));
         $pdf->setPaper('A4', 'portrait');
 
-        return $pdf->download("Laporan-Menu-Terlaris-{$month}.pdf");
+        return $pdf->stream("Laporan-Menu-Terlaris-{$month}.pdf");
     }
 
     /**
@@ -172,12 +189,16 @@ class ReportController extends Controller
 
     private function getSummary($orders): array
     {
+        // Semua angka pendapatan berbasis pesanan SELESAI (completed) agar konsisten:
+        // Tunai + Digital = Total Pendapatan, dan cocok dengan tabel tren harian.
+        $completed = $orders->where('status', 'completed');
+
         return [
             'total_orders' => $orders->count(),
-            'completed' => $orders->where('status', 'completed')->count(),
-            'revenue' => $orders->where('status', 'completed')->sum('total_amount'),
-            'cash_revenue' => $orders->filter(fn ($o) => $o->payment?->method === 'tunai' && $o->payment?->status === 'paid')->sum('total_amount'),
-            'digital_revenue' => $orders->filter(fn ($o) => $o->payment?->method === 'midtrans' && $o->payment?->status === 'paid')->sum('total_amount'),
+            'completed' => $completed->count(),
+            'revenue' => $completed->sum('total_amount'),
+            'cash_revenue' => $completed->filter(fn ($o) => $o->payment?->method === 'tunai')->sum('total_amount'),
+            'digital_revenue' => $completed->filter(fn ($o) => $o->payment?->method !== 'tunai')->sum('total_amount'),
         ];
     }
 }

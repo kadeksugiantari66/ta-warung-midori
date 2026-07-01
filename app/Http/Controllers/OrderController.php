@@ -18,13 +18,33 @@ use Illuminate\View\View;
 class OrderController extends Controller
 {
     /**
+     * Simulasi pelanggan (untuk demo share-screen): pilih meja acak yang
+     * tersedia lalu arahkan ke halaman menunya — identik dengan hasil scan QR.
+     */
+    public function simulasi(): RedirectResponse
+    {
+        $table = Table::where('status', 'available')->inRandomOrder()->first()
+            ?? Table::inRandomOrder()->first();
+
+        abort_if(! $table, 404, 'Belum ada meja untuk simulasi.');
+
+        // Pastikan meja punya token, lalu bawa token agar lolos gerbang "harus scan".
+        if (blank($table->qr_token)) {
+            $table->generateQr();
+            $table->refresh();
+        }
+
+        return redirect()->route('order.menu', ['table' => $table->id_meja, 'token' => $table->qr_token]);
+    }
+
+    /**
      * Menampilkan halaman menu pelanggan setelah scan QR.
      */
     public function menu(Request $request, Table $table): View
     {
-        // QR dinamis: tolak akses jika token tidak cocok
-        // (mencegah pemesanan dari luar restoran memakai QR lama/hasil foto)
-        if ($table->qr_token && $request->query('token') !== $table->qr_token) {
+        // Pemesanan HARUS lewat scan QR di meja: wajib token yang cocok dengan token
+        // meja. Akses manual (mengetik URL) tanpa token / token salah akan ditolak.
+        if (blank($request->query('token')) || $request->query('token') !== $table->qr_token) {
             return view('order.invalid', compact('table'));
         }
 
@@ -80,6 +100,13 @@ class OrderController extends Controller
             'payment_method' => ['required', 'in:midtrans,tunai'],
             'customer_email' => ['nullable', 'email', 'max:255'],
         ]);
+
+        // Gerbang keamanan: pemesanan hanya boleh dari hasil scan QR (token harus cocok).
+        abort_if(
+            blank($request->input('token')) || $request->input('token') !== $table->qr_token,
+            403,
+            'Pemesanan harus melalui scan QR di meja.'
+        );
 
         // Nomor antrean: hitung pesanan hari ini + 1
         $queueNumber = Order::whereDate('created_at', today())->count() + 1;

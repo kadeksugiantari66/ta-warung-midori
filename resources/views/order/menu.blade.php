@@ -437,6 +437,7 @@
             {{-- Submit --}}
             <form method="POST" action="{{ route('order.store', $table) }}" id="orderForm">
                 @csrf
+                <input type="hidden" name="token" value="{{ request('token') }}">
                 <div id="orderItems"></div>
 
                 {{-- Email pelanggan untuk pengiriman nota --}}

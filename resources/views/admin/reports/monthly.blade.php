@@ -5,6 +5,12 @@
         <h2 class="font-headline text-3xl font-black text-primary">Laporan Bulanan</h2>
         <p class="text-on-surface-variant text-sm mt-1">Rekap penjualan & tren per bulan.</p>
     </div>
+    <div class="flex gap-2">
+        <a href="{{ route('admin.reports.export.pdf.monthly', ['month' => $month]) }}" target="_blank"
+           class="flex items-center gap-2 bg-error-container text-on-error-container text-sm font-semibold px-4 py-2.5 rounded-xl hover:opacity-90 transition-all">
+            <span class="material-symbols-outlined text-base">picture_as_pdf</span> PDF
+        </a>
+    </div>
 </div>
 
 {{-- Tab Navigasi --}}

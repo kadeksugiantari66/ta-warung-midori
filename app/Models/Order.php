@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Mail\InvoiceMail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\InvoiceMail;
 
 class Order extends Model
 {
@@ -33,15 +33,14 @@ class Order extends Model
     }
 
     /**
-     * Selesaikan pesanan: ubah status ke completed, bebaskan meja,
-     * dan rotasi QR Code meja agar siap untuk pelanggan berikutnya.
+     * Selesaikan pesanan: ubah status ke completed dan bebaskan meja.
+     * Token QR TIDAK diubah agar QR yang sudah dicetak tetap valid untuk
+     * pelanggan berikutnya (token hanya berganti saat admin "Buat Ulang QR").
      */
     public function complete(): void
     {
         $this->update(['status' => 'completed']);
-        $meja = $this->table()->first();
-        $meja->update(['status' => 'available']);
-        $meja->generateQr();
+        $this->table()->first()?->update(['status' => 'available']);
     }
 
     /**

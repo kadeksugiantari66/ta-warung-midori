@@ -60,6 +60,7 @@ class OrderFlowTest extends TestCase
         [$table, $available] = $this->seedMenu();
 
         $this->post(route('order.store', $table), [
+            'token' => 'secrettoken123',
             'items' => [['id_menu' => $available->id_menu, 'quantity' => 2]],
             'payment_method' => 'tunai',
             'customer_email' => 'pelanggan@contoh.com',
@@ -81,6 +82,7 @@ class OrderFlowTest extends TestCase
         [$table, $available] = $this->seedMenu();
 
         $this->post(route('order.store', $table), [
+            'token' => 'secrettoken123',
             'items' => [['id_menu' => $available->id_menu, 'quantity' => 1]],
             'payment_method' => 'tunai',
         ])->assertRedirect();
@@ -89,6 +91,19 @@ class OrderFlowTest extends TestCase
         $this->actingAs($kasir)->post(route('kasir.payment.cash', Order::firstOrFail()))->assertRedirect();
 
         Mail::assertNothingSent();
+    }
+
+    public function test_store_rejects_order_without_valid_token(): void
+    {
+        [$table, $available] = $this->seedMenu();
+
+        // Tanpa token (akses manual, bukan hasil scan QR) -> ditolak, order tidak dibuat
+        $this->post(route('order.store', $table), [
+            'items' => [['id_menu' => $available->id_menu, 'quantity' => 1]],
+            'payment_method' => 'tunai',
+        ])->assertForbidden();
+
+        $this->assertSame(0, Order::count());
     }
 
     public function test_customer_can_complete_a_paid_and_ready_order(): void
