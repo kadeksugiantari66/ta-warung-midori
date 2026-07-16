@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Table;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class OrderSeeder extends Seeder
 {
@@ -41,11 +42,15 @@ class OrderSeeder extends Seeder
 
                 // Mixed payment methods
                 $method = rand(1, 10) <= 7 ? 'tunai' : 'midtrans';
+                $snapToken = $method === 'midtrans' ? 'snap-seed-' . Str::random(32) : null;
+                $transactionId = $method === 'midtrans' ? 'trx-seed-' . Str::uuid() : null;
                 Payment::create([
                     'id_order' => $order->id_order,
                     'method' => $method,
                     'amount' => $total,
                     'status' => 'paid',
+                    'snap_token' => $snapToken,
+                    'transaction_id' => $transactionId,
                     'created_at' => $orderTime,
                     'updated_at' => $orderTime,
                 ]);
@@ -95,11 +100,15 @@ class OrderSeeder extends Seeder
                 };
 
                 $method = rand(1, 10) <= 6 ? 'tunai' : 'midtrans';
+                $snapToken = $method === 'midtrans' ? 'snap-seed-' . Str::random(32) : null;
+                $transactionId = $method === 'midtrans' ? 'trx-seed-' . Str::uuid() : null;
                 Payment::create([
                     'id_order' => $order->id_order,
                     'method' => $method,
                     'amount' => $total,
                     'status' => $paymentStatus,
+                    'snap_token' => $snapToken,
+                    'transaction_id' => $transactionId,
                     'created_at' => $orderTime,
                     'updated_at' => $orderTime,
                 ]);
@@ -126,11 +135,16 @@ class OrderSeeder extends Seeder
             }
 
             $paymentStatus = ($status === 'pending') ? 'pending' : 'paid';
+            $method = ($idx % 2 === 0) ? 'tunai' : 'midtrans';
+            $snapToken = $method === 'midtrans' ? 'snap-seed-' . Str::random(32) : null;
+            $transactionId = $method === 'midtrans' ? 'trx-seed-' . Str::uuid() : null;
             Payment::create([
                 'id_order' => $order->id_order,
-                'method' => ($idx % 2 === 0) ? 'tunai' : 'midtrans',
+                'method' => $method,
                 'amount' => $total,
                 'status' => $paymentStatus,
+                'snap_token' => $snapToken,
+                'transaction_id' => $transactionId,
                 'created_at' => $orderTime,
                 'updated_at' => $orderTime,
             ]);

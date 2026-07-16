@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
 use Midtrans\Notification;
 use Midtrans\Snap;
@@ -59,6 +60,11 @@ class MidtransController extends Controller
             ]
         );
 
+        Log::info('Midtrans snap token created', [
+            'order_id' => $order->id_order,
+            'snap_token' => substr($snapToken, 0, 20) . '...',
+        ]);
+
         return response()->json([
             'snap_token' => $snapToken,
             'client_key' => config('services.midtrans.client_key'),
@@ -75,6 +81,12 @@ class MidtransController extends Controller
         $transactionStatus = $notification->transaction_status;
         $orderId = $notification->order_id; // format: MIDORI-{id}-{timestamp}
         $fraudStatus = $notification->fraud_status;
+
+        Log::info('Midtrans webhook received', [
+            'order_id' => $orderId,
+            'transaction_status' => $transactionStatus,
+            'transaction_id' => $notification->transaction_id,
+        ]);
 
         // Ekstrak order ID asli
         $parts = explode('-', $orderId);
@@ -103,6 +115,12 @@ class MidtransController extends Controller
             ]
         );
 
+        Log::info('Midtrans webhook payment updated', [
+            'order_id' => $order->id_order,
+            'payment_status' => $paymentStatus,
+            'transaction_id' => $notification->transaction_id,
+        ]);
+
         if ($paymentStatus === 'paid') {
             $order->update(['status' => 'confirmed']);
             // Meja TIDAK di-set available di sini, menunggu Dapur set 'completed'
@@ -120,7 +138,14 @@ class MidtransController extends Controller
         $transactionId = $request->input('transaction_id');
         $orderId = $request->input('order_id'); // e.g., MIDORI-15-...
 
+        Log::info('Midtrans verify called', [
+            'order_id' => $order->id_order,
+            'transaction_id' => $transactionId,
+            'midtrans_order_id' => $orderId,
+        ]);
+
         if (! $transactionId || ! $orderId) {
+            Log::warning('Midtrans verify missing params', ['order_id' => $order->id_order]);
             return response()->json(['success' => false, 'message' => 'Missing param']);
         }
 
@@ -147,6 +172,12 @@ class MidtransController extends Controller
                 ]
             );
 
+            Log::info('Midtrans verify payment updated', [
+                'order_id' => $order->id_order,
+                'payment_status' => $paymentStatus,
+                'transaction_id' => $status->transaction_id,
+            ]);
+
             // Jika sebelumnya masih pending namun sekarang paid
             if ($paymentStatus === 'paid' && $order->status === 'pending') {
                 $order->update(['status' => 'confirmed']);
@@ -157,6 +188,10 @@ class MidtransController extends Controller
             return response()->json(['success' => true, 'status' => $paymentStatus]);
 
         } catch (\Exception $e) {
+            Log::error('Midtrans verify failed', [
+                'order_id' => $order->id_order,
+                'error' => $e->getMessage(),
+            ]);
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

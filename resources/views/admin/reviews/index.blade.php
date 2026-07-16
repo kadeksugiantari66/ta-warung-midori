@@ -14,7 +14,6 @@
                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Rating</th>
                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Komentar</th>
                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Tanggal</th>
-                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant text-right">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-surface-container">
@@ -28,18 +27,9 @@
                     </td>
                     <td class="px-6 py-4 text-sm text-on-surface-variant max-w-xs truncate">{{ $review->comment ?? '—' }}</td>
                     <td class="px-6 py-4 text-xs text-on-surface-variant">{{ $review->created_at->format('d M Y') }}</td>
-                    <td class="px-6 py-4 text-right">
-                        <form method="POST" action="{{ route('admin.reviews.destroy', $review) }}" class="inline"
-                              data-confirm="Hapus ulasan ini?">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="p-2 text-error hover:bg-error-container rounded-lg transition-colors">
-                                <span class="material-symbols-outlined text-base">delete</span>
-                            </button>
-                        </form>
-                    </td>
                 </tr>
             @empty
-                <tr><td colspan="5" class="px-6 py-12 text-center text-on-surface-variant">Belum ada ulasan.</td></tr>
+                <tr><td colspan="4" class="px-6 py-12 text-center text-on-surface-variant">Belum ada ulasan.</td></tr>
             @endforelse
         </tbody>
     </table>

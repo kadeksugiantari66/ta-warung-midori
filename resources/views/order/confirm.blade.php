@@ -161,7 +161,7 @@ function pageApp() {
                     clearInterval(this.timer);
                     window.location.href = '{{ route('order.thanks', $order) }}';
                 }
-            } catch(e) {}
+            } catch(e) { console.error('Poll status error:', e); }
         },
 
         async submitComplete() {
@@ -177,7 +177,7 @@ function pageApp() {
                     window.location.href = '{{ route('order.thanks', $order) }}';
                     return;
                 }
-            } catch(e) {}
+            } catch(e) { console.error('Complete error:', e); }
             this.completing = false;
         },
 
@@ -194,6 +194,7 @@ function pageApp() {
                     this.paymentError = 'Gagal memuat pembayaran. Coba lagi.';
                 }
             } catch(e) {
+                console.error('Snap token error:', e);
                 this.paymentError = 'Terjadi kesalahan. Coba lagi.';
             } finally {
                 this.loading = false;
@@ -204,12 +205,14 @@ function pageApp() {
             window.snap.pay(this.snapToken, {
                 onSuccess: async (result) => {
                     try {
-                        await fetch('{{ route('midtrans.verify', $order) }}', {
+                        const res = await fetch('{{ route('midtrans.verify', $order) }}', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                             body: JSON.stringify({ transaction_id: result.transaction_id, order_id: result.order_id })
                         });
-                    } catch(e) {}
+                        const data = await res.json();
+                        if (!data.success) console.error('Verify failed:', data.message);
+                    } catch(e) { console.error('Verify error:', e); }
                     this.paid = true;
                     this.startPolling();
                 },

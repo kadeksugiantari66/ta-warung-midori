@@ -60,7 +60,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     // Kumpulan Review Makanan
     Route::resource('reviews', ReviewController::class)
-        ->only(['index', 'destroy']);
+        ->only(['index']);
 
     // Pengaturan Nomor Meja & Generate QR Code
     Route::resource('tables', TableController::class)
