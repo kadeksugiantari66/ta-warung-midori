@@ -108,4 +108,28 @@ class OrderMonitorTest extends TestCase
         $this->actingAs($dapur)->get(route('admin.orders.index'))->assertForbidden();
         $this->actingAs($dapur)->get(route('kasir.orders.index'))->assertForbidden();
     }
+
+    public function test_kasir_can_complete_ready_order_and_free_table(): void
+    {
+        $kasir = User::factory()->create(['role' => 'kasir']);
+        $order = $this->makeOrder('ready');
+        $order->table->update(['status' => 'occupied']);
+
+        $this->actingAs($kasir)
+            ->post(route('kasir.orders.complete', $order))
+            ->assertRedirect();
+
+        $this->assertSame('completed', $order->fresh()->status);
+        $this->assertSame('available', $order->table->fresh()->status);
+    }
+
+    public function test_complete_ignored_when_order_not_ready(): void
+    {
+        $kasir = User::factory()->create(['role' => 'kasir']);
+        $order = $this->makeOrder('processing');
+
+        $this->actingAs($kasir)->post(route('kasir.orders.complete', $order))->assertRedirect();
+
+        $this->assertSame('processing', $order->fresh()->status);
+    }
 }

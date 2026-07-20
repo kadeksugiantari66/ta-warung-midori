@@ -71,7 +71,20 @@
                                 <span class="font-headline font-black text-2xl text-primary">{{ $order->table->table_number }}</span>
                                 <span class="text-on-surface-variant text-sm ml-2">#{{ $order->queue_number }}</span>
                             </div>
-                            <span class="px-3 py-1 text-xs font-bold rounded-full {{ $badge[0] }}">{{ $badge[1] }}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 text-xs font-bold rounded-full {{ $badge[0] }}">{{ $badge[1] }}</span>
+                                @if ($order->status === 'ready')
+                                    <form method="POST" action="{{ route('kasir.orders.complete', $order) }}"
+                                          onsubmit="return confirm('Tandai pesanan meja {{ $order->table->table_number }} selesai? Meja akan kembali tersedia.');">
+                                        @csrf
+                                        <button type="submit"
+                                                class="flex items-center gap-1 bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:opacity-90 active:scale-95 transition-all">
+                                            <span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+                                            Selesai
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
                     @endforeach
                 </div>

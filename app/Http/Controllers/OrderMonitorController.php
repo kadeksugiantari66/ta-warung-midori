@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -53,6 +54,22 @@ class OrderMonitorController extends Controller
             'order' => $order,
             'prefix' => $this->prefix(),
         ]);
+    }
+
+    /**
+     * Tandai pesanan SELESAI saat sudah "Siap Diantar" (ready):
+     * status jadi completed & meja kembali tersedia. Tanpa perubahan skema DB.
+     */
+    public function complete(Order $order): RedirectResponse
+    {
+        if ($order->status === 'ready') {
+            $tableNumber = $order->table?->table_number;
+            $order->complete();
+
+            return back()->with('success', "Pesanan meja {$tableNumber} selesai. Meja kembali tersedia.");
+        }
+
+        return back();
     }
 
     /**

@@ -104,6 +104,7 @@ Route::middleware(['auth', 'verified', 'role:kasir'])->prefix('kasir')->name('ka
     // Lihat Pesanan (monitoring) — filter status & rentang tanggal
     Route::get('/orders', [OrderMonitorController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderMonitorController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/complete', [OrderMonitorController::class, 'complete'])->name('orders.complete');
 
     // Sistem Konfirmasi Pembayaran Kasir
     Route::get('/payment/{order}', [PaymentController::class, 'show'])->name('payment.show');
