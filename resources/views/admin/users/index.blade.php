@@ -66,7 +66,7 @@
                                     </button>
                                 </form>
                                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}" class="contents"
-                                      data-confirm="Hapus akun {{ $user->name }}?">
+                                      data-confirm="Hapus akun {{ $user->name }}? Tindakan ini tidak bisa dibatalkan.">
                                     @csrf @method('DELETE')
                                     <button type="submit"
                                             class="p-2 text-error hover:bg-error-container rounded-lg transition-colors"

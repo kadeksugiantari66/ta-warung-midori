@@ -69,7 +69,7 @@
                                 </button>
                             </form>
                             <form method="POST" action="{{ route('admin.products.destroy', $product) }}" class="inline"
-                                  data-confirm="Hapus menu {{ $product->name }}?">
+                                  data-confirm="Hapus menu {{ $product->name }}? Menu ini juga hilang dari riwayat pesanan & ulasannya.">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="p-2 text-error hover:bg-error-container rounded-lg transition-colors">
                                     <span class="material-symbols-outlined text-base">delete</span>

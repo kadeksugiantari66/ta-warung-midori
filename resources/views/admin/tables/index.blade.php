@@ -75,7 +75,7 @@
                             </button>
                         </form>
                         <form method="POST" action="{{ route('admin.tables.destroy', $table) }}"
-                              data-confirm="Hapus meja {{ $table->table_number }}?">
+                              data-confirm="Hapus meja {{ $table->table_number }}? Seluruh riwayat pesanan meja ini ikut terhapus permanen.">
                             @csrf @method('DELETE')
                             <button type="submit"
                                     class="text-xs px-3 py-1.5 bg-error-container text-on-error-container font-semibold rounded-lg hover:opacity-90 transition-all">
