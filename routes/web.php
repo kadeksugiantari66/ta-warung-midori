@@ -105,6 +105,7 @@ Route::middleware(['auth', 'verified', 'role:kasir'])->prefix('kasir')->name('ka
     Route::get('/orders', [OrderMonitorController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderMonitorController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/complete', [OrderMonitorController::class, 'complete'])->name('orders.complete');
+    Route::post('/orders/{order}/free-table', [OrderMonitorController::class, 'freeTable'])->name('orders.free-table');
 
     // Sistem Konfirmasi Pembayaran Kasir
     Route::get('/payment/{order}', [PaymentController::class, 'show'])->name('payment.show');

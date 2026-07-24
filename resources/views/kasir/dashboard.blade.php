@@ -83,7 +83,7 @@
             @endif
         </div>
 
-        {{-- Siap Diantar — tandai selesai & bebaskan meja --}}
+        {{-- Siap Diantar — tandai selesai (tanpa bebaskan meja) --}}
         <div>
             <h3 class="font-headline font-bold text-lg text-primary mb-4">Siap Diantar</h3>
             @if($readyOrders->isEmpty())
@@ -103,12 +103,46 @@
                                 <span class="px-3 py-1 text-xs font-bold rounded-full bg-[#bcf0ae] text-[#002201]">Siap Diantar</span>
                             </div>
                             <form method="POST" action="{{ route('kasir.orders.complete', $order) }}"
-                                  onsubmit="return confirm('Tandai pesanan meja {{ $order->table->table_number }} selesai? Meja akan kembali tersedia.');">
+                                  onsubmit="return confirm('Tandai pesanan meja {{ $order->table->table_number }} sudah diterima pelanggan?');">
                                 @csrf
                                 <button type="submit"
                                         class="w-full flex items-center justify-center gap-1.5 bg-primary text-white text-sm font-bold px-3 py-2.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all">
                                     <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">check_circle</span>
-                                    Pesanan Selesai
+                                    Pesanan Diterima
+                                </button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        {{-- Meja Belum Kosong — pelanggan sudah selesai, meja masih occupied --}}
+        <div>
+            <h3 class="font-headline font-bold text-lg text-primary mb-4">Meja Belum Kosong</h3>
+            @if($occupiedOrders->isEmpty())
+                <div class="bg-surface-container-lowest rounded-2xl p-10 text-center shadow-sm">
+                    <span class="material-symbols-outlined text-4xl text-on-surface-variant opacity-20 block mb-2" style="font-variation-settings:'FILL' 1">table_restaurant</span>
+                    <p class="text-on-surface-variant text-sm">Semua meja sudah bersih.</p>
+                </div>
+            @else
+                <div class="space-y-3">
+                    @foreach ($occupiedOrders as $order)
+                        <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-tertiary-fixed">
+                            <div class="flex justify-between items-center mb-3">
+                                <div>
+                                    <span class="font-headline font-black text-2xl text-primary">{{ $order->table->table_number }}</span>
+                                    <span class="text-on-surface-variant text-sm ml-2">#{{ $order->queue_number }}</span>
+                                </div>
+                                <span class="px-3 py-1 text-xs font-bold rounded-full bg-[#ffdcc5] text-[#301400]">Selesai</span>
+                            </div>
+                            <form method="POST" action="{{ route('kasir.orders.free-table', $order) }}"
+                                  onsubmit="return confirm('Kosongkan meja {{ $order->table->table_number }}? Meja akan kembali tersedia.');">
+                                @csrf
+                                <button type="submit"
+                                        class="w-full flex items-center justify-center gap-1.5 bg-[#301400] text-white text-sm font-bold px-3 py-2.5 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all">
+                                    <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">cleaning_services</span>
+                                    Kosongkan Meja
                                 </button>
                             </form>
                         </div>

@@ -25,6 +25,13 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
+        // Pesanan selesai tapi meja belum dikosongkan (pelanggan belum/telah pergi)
+        $occupiedOrders = Order::with(['table'])
+            ->where('status', 'completed')
+            ->whereHas('table', fn($q) => $q->where('status', 'occupied'))
+            ->latest()
+            ->get();
+
         // Pesanan menunggu pembayaran (tunai atau midtrans pending)
         $pendingOrders = Order::with(['table', 'payment'])
             ->where('status', 'pending')
@@ -34,7 +41,7 @@ class DashboardController extends Controller
         // Hash sinkronisasi realtime berdasarkan aktivitas pesanan dan pembayaran (termasuk yang masuk dapur dan payment status)
         $pollHash = Order::max('updated_at');
 
-        return view('kasir.dashboard', compact('todayOrders', 'todayRevenue', 'activeOrders', 'pendingOrders', 'pollHash'));
+        return view('kasir.dashboard', compact('todayOrders', 'todayRevenue', 'activeOrders', 'pendingOrders', 'occupiedOrders', 'pollHash'));
     }
 
     public function poll(): \Illuminate\Http\JsonResponse

@@ -33,14 +33,25 @@ class Order extends Model
     }
 
     /**
-     * Selesaikan pesanan: ubah status ke completed dan bebaskan meja.
+     * Selesaikan pesanan: ubah status ke completed.
+     * Meja TIDAK langsung dibebaskan — kasir/waiter akan mengosongkan meja
+     * secara manual setelah pelanggan benar-benar pergi.
      * Token QR TIDAK diubah agar QR yang sudah dicetak tetap valid untuk
      * pelanggan berikutnya (token hanya berganti saat admin "Buat Ulang QR").
      */
     public function complete(): void
     {
         $this->update(['status' => 'completed']);
+    }
+
+    /**
+     * Bebaskan meja setelah pelanggan selesai dan pergi.
+     * Dipanggil oleh kasir/waiter secara manual.
+     */
+    public function freeTable(): void
+    {
         $this->table()->first()?->update(['status' => 'available']);
+        $this->touch(); // trigger poll refresh di dashboard kasir
     }
 
     /**

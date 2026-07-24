@@ -53,7 +53,7 @@
                                     <span class="material-symbols-outlined text-base">edit</span>
                                 </button>
                                 <form method="POST" action="{{ route('admin.categories.destroy', $category) }}" class="inline"
-                                      data-confirm="Hapus kategori {{ $category->name }}?">
+                                      data-confirm="Hapus kategori {{ $category->name }}? Semua menu di kategori ini ikut terhapus permanen.">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="p-2 text-error hover:bg-error-container rounded-lg transition-colors">
                                         <span class="material-symbols-outlined text-base">delete</span>

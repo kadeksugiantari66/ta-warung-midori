@@ -58,7 +58,8 @@ class OrderMonitorController extends Controller
 
     /**
      * Tandai pesanan SELESAI saat sudah "Siap Diantar" (ready):
-     * status jadi completed & meja kembali tersedia. Tanpa perubahan skema DB.
+     * status jadi completed. Meja TIDAK langsung dibebaskan —
+     * kasir akan mengosongkan meja setelah pelanggan benar-benar pergi.
      */
     public function complete(Order $order): RedirectResponse
     {
@@ -66,10 +67,25 @@ class OrderMonitorController extends Controller
             $tableNumber = $order->table?->table_number;
             $order->complete();
 
-            return back()->with('success', "Pesanan meja {$tableNumber} selesai. Meja kembali tersedia.");
+            return back()->with('success', "Pesanan meja {$tableNumber} selesai.");
         }
 
         return back();
+    }
+
+    /**
+     * Bebaskan meja setelah pelanggan selesai dan benar-benar pergi.
+     */
+    public function freeTable(Order $order): RedirectResponse
+    {
+        if ($order->status === 'completed' && $order->table?->status === 'occupied') {
+            $tableNumber = $order->table->table_number;
+            $order->freeTable();
+
+            return back()->with('success', "Meja {$tableNumber} berhasil dikosongkan.");
+        }
+
+        return back()->with('error', 'Meja tidak dapat dikosongkan.');
     }
 
     /**
